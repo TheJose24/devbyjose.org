@@ -11,5 +11,10 @@ export const routes: Routes = [
     loadComponent: () => import('./workspaces/proyectos/proyectos').then((m) => m.Proyectos),
     title: 'proyectos · www.devbyjose.org',
   },
+  {
+    path: 'homelab',
+    loadComponent: () => import('./workspaces/homelab/homelab').then((m) => m.HomelabWs),
+    title: 'homelab · www.devbyjose.org',
+  },
   { path: '**', redirectTo: '' },
 ];

@@ -7,7 +7,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { Wm, WORKSPACES, routeFor, workspaceFromUrl, type WorkspaceId } from './core/wm';
-import { Homelab, ago } from './core/homelab';
+import { Homelab } from './core/homelab';
 
 @Component({
   selector: 'dbj-root',
@@ -63,11 +63,12 @@ export class App implements OnInit {
     return 'homelab';
   }
 
+  /** Fecha absoluta a propósito: una relativa se congelaría en el HTML durante
+   *  el prerenderizado y mentiría hasta que hidrate. */
   protected hostTitle(): string {
     const s = this.homelab.status();
     if (this.homelab.mode() === 'live') return 'El homelab responde ahora mismo';
-    const when = ago(s.generatedAt);
-    return when ? `Último registro ${when}` : 'Último registro conocido';
+    return `Último registro: ${s.generatedAt.slice(0, 16).replace('T', ' ')}`;
   }
 
   @HostListener('window:resize')
