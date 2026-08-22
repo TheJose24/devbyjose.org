@@ -8,7 +8,7 @@ describe('Notas', () => {
   async function montar(slug = '') {
     await TestBed.configureTestingModule({
       imports: [Notas],
-      providers: [provideRouter([])],
+      providers: [provideRouter([{ path: 'notas/:slug', children: [] }])],
     }).compileComponents();
     const fixture = TestBed.createComponent(Notas);
     fixture.componentRef.setInput('slug', slug);
@@ -19,6 +19,15 @@ describe('Notas', () => {
   it('lista todas las notas', async () => {
     const el = (await montar()).nativeElement as HTMLElement;
     expect(el.querySelectorAll('tbody tr').length).toBe(NOTAS.length);
+  });
+
+  it('cada nota es un enlace rastreable a su propia ruta', async () => {
+    const el = (await montar()).nativeElement as HTMLElement;
+    const enlaces = [...el.querySelectorAll<HTMLAnchorElement>('tbody a.nm')];
+    expect(enlaces.length).toBe(NOTAS.length);
+    for (const n of NOTAS) {
+      expect(enlaces.some((a) => a.getAttribute('href') === `/notas/${n.slug}`)).toBe(true);
+    }
   });
 
   it('sin slug abre la más reciente', async () => {
@@ -69,7 +78,7 @@ describe('Notas', () => {
     wm.register('cat nota');
     wm.focus('ls ~/notas');
 
-    ((fixture.nativeElement as HTMLElement).querySelectorAll('tbody tr')[1] as HTMLElement).click();
+    ((fixture.nativeElement as HTMLElement).querySelectorAll('tbody a.nm')[1] as HTMLElement).click();
     await fixture.whenStable();
     expect(wm.focused()).toBe('cat nota');
   });

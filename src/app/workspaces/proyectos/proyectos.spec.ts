@@ -14,13 +14,15 @@ describe('Proyectos', () => {
   it('lista todos los proyectos y abre el primero', async () => {
     const el = (await montar()).nativeElement as HTMLElement;
     expect(el.querySelectorAll('tbody tr').length).toBe(PROYECTOS.length);
+    // Elemento interactivo real, alcanzable con teclado.
+    expect(el.querySelectorAll('tbody button.enlace').length).toBe(PROYECTOS.length);
     expect(el.querySelector('.titulo')?.textContent).toContain(PROYECTOS[0].titulo);
   });
 
   it('al elegir otra fila cambia la ficha', async () => {
     const fixture = await montar();
     const el = fixture.nativeElement as HTMLElement;
-    (el.querySelectorAll('tbody tr')[1] as HTMLElement).click();
+    (el.querySelectorAll('tbody .enlace')[1] as HTMLElement).click();
     await fixture.whenStable();
     expect(el.querySelector('.titulo')?.textContent).toContain(PROYECTOS[1].titulo);
   });
@@ -33,7 +35,7 @@ describe('Proyectos', () => {
     wm.register('cat README');
     wm.focus('ls -la ~/proyectos');
 
-    ((fixture.nativeElement as HTMLElement).querySelectorAll('tbody tr')[1] as HTMLElement).click();
+    ((fixture.nativeElement as HTMLElement).querySelectorAll('tbody .enlace')[1] as HTMLElement).click();
     await fixture.whenStable();
     expect(wm.focused()).toBe('cat README');
   });
