@@ -57,3 +57,12 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## Contenido que se copia a mano
+
+`public/cv.pdf` viene de `../cv/CV-Jose-Sanchez-FullStack.pdf`. Al regenerar el CV hay que
+volver a copiarlo:
+
+```bash
+cp ../cv/CV-Jose-Sanchez-FullStack.pdf public/cv.pdf
+```
