@@ -3,7 +3,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { Shell, type ShellLine } from '../../core/shell';
-import { Wm } from '../../core/wm';
+import { Wm, routeFor } from '../../core/wm';
 
 @Component({
   selector: 'dbj-zsh',
@@ -87,7 +87,7 @@ export class Zsh {
     );
 
     if (result.download) this.descargar(result.download);
-    if (result.goto) void this.router.navigate([result.goto === 'inicio' ? '/' : `/${result.goto}`]);
+    if (result.goto) void this.router.navigate([routeFor(result.goto)]);
 
     queueMicrotask(() => {
       const el = this.logEl()?.nativeElement.parentElement;

@@ -41,11 +41,14 @@ export class Wm {
     return f ? `${this.path()} · ${f}` : this.path();
   });
 
+  /**
+   * Sincroniza el espacio activo. No toca la lista de ventanas: cada `dbj-pane`
+   * se da de alta y de baja solo, así que al cambiar de ruta el enrutador
+   * destruye las viejas y monta las nuevas sin que haya que vaciar nada a mano
+   * —y sin la carrera que eso provocaría con el registro de las nuevas—.
+   */
   goto(id: WorkspaceId): void {
-    if (this.workspace() === id) return;
     this.workspace.set(id);
-    this.panes.set([]);
-    this.focused.set(null);
   }
 
   /** Cada ventana se anuncia al montarse; la primera se lleva el foco. */
@@ -77,4 +80,15 @@ export class Wm {
     }
     this.focused.set(list[next]);
   }
+}
+
+/** Ruta del enrutador para un espacio. `inicio` vive en la raíz. */
+export function routeFor(id: WorkspaceId): string {
+  return id === 'inicio' ? '/' : `/${id}`;
+}
+
+/** Espacio al que corresponde una URL. Lo desconocido cae en `inicio`. */
+export function workspaceFromUrl(url: string): WorkspaceId {
+  const primero = url.split(/[?#]/)[0].split('/').filter(Boolean)[0] ?? '';
+  return WORKSPACES.find((w) => w.id === primero)?.id ?? 'inicio';
 }

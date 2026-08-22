@@ -3,8 +3,10 @@ import {
   effect, inject, signal,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { Router, RouterOutlet } from '@angular/router';
-import { Wm, WORKSPACES, type WorkspaceId } from './core/wm';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { filter, map } from 'rxjs';
+import { Wm, WORKSPACES, routeFor, workspaceFromUrl, type WorkspaceId } from './core/wm';
 import { Homelab, ago } from './core/homelab';
 
 @Component({
@@ -26,11 +28,22 @@ export class App implements OnInit {
 
   protected readonly ledClass = signal('on');
 
+  /** La URL manda sobre el espacio activo: así el resaltado de la barra, los
+   *  enlaces directos y el botón de atrás del navegador coinciden siempre. */
+  private readonly url = toSignal(
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      map((e) => e.urlAfterRedirects),
+    ),
+    { initialValue: this.router.url },
+  );
+
   constructor() {
     effect(() => {
       const mode = this.homelab.mode();
       this.ledClass.set(mode === 'live' ? 'on' : mode === 'snapshot' ? 'stale' : 'off');
     });
+    effect(() => this.wm.goto(workspaceFromUrl(this.url())));
   }
 
   ngOnInit(): void {
@@ -40,7 +53,7 @@ export class App implements OnInit {
   }
 
   protected goto(id: WorkspaceId): void {
-    void this.router.navigate([id === 'inicio' ? '/' : `/${id}`]);
+    void this.router.navigate([routeFor(id)]);
   }
 
   protected hostLabel(): string {
