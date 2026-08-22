@@ -1,19 +1,40 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { Location } from '@angular/common';
 import { App } from './app';
-import { Wm } from './core/wm';
+import { Wm, routeFor, workspaceFromUrl } from './core/wm';
 import { ago } from './core/homelab';
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideRouter([])],
+      providers: [provideRouter([
+        { path: '', children: [] },
+        { path: 'proyectos', children: [] },
+      ])],
     }).compileComponents();
   });
 
   it('se crea', () => {
     expect(TestBed.createComponent(App).componentInstance).toBeTruthy();
+  });
+
+  it('resalta en la barra el espacio de la ruta actual', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const wm = TestBed.inject(Wm);
+    const el = fixture.nativeElement as HTMLElement;
+
+    expect(wm.workspace()).toBe('inicio');
+    expect(el.querySelector('.ws-btn.active')?.textContent).toContain('inicio');
+
+    await TestBed.inject(Location).go('/proyectos');
+    (el.querySelectorAll('.ws-btn')[1] as HTMLElement).click();
+    await fixture.whenStable();
+
+    expect(wm.workspace()).toBe('proyectos');
+    expect(el.querySelector('.ws-btn.active')?.textContent).toContain('proyectos');
   });
 
   it('pinta un botón por espacio de trabajo', async () => {
@@ -35,11 +56,13 @@ describe('Wm', () => {
     expect(wm.focused()).toBe('neofetch');
   });
 
-  it('cambiar de espacio vacía las ventanas', () => {
+  it('cambiar de espacio no toca la lista de ventanas', () => {
+    // Las ventanas se dan de baja solas al destruirse; vaciarlas aquí competía
+    // con el registro de las nuevas al montarse la ruta siguiente.
     wm.register('neofetch');
     wm.goto('notas');
-    expect(wm.tabs()).toEqual([]);
-    expect(wm.focused()).toBeNull();
+    expect(wm.workspace()).toBe('notas');
+    expect(wm.tabs()).toEqual(['neofetch']);
   });
 
   it('step da la vuelta salvo cuando se le pide que no', () => {
@@ -68,5 +91,30 @@ describe('ago', () => {
   });
   it('devuelve null si la fecha no es válida', () => {
     expect(ago('no-es-una-fecha', base)).toBeNull();
+  });
+});
+
+describe('correspondencia entre ruta y espacio', () => {
+  it('routeFor deja inicio en la raíz', () => {
+    expect(routeFor('inicio')).toBe('/');
+    expect(routeFor('homelab')).toBe('/homelab');
+  });
+
+  it('workspaceFromUrl reconoce el primer segmento', () => {
+    expect(workspaceFromUrl('/')).toBe('inicio');
+    expect(workspaceFromUrl('/proyectos')).toBe('proyectos');
+    expect(workspaceFromUrl('/notas/vllm-doble-gpu')).toBe('notas');
+    expect(workspaceFromUrl('/homelab?x=1#y')).toBe('homelab');
+  });
+
+  it('lo desconocido cae en inicio', () => {
+    expect(workspaceFromUrl('/musica')).toBe('inicio');
+    expect(workspaceFromUrl('')).toBe('inicio');
+  });
+
+  it('ida y vuelta para todos los espacios', () => {
+    for (const id of ['inicio', 'proyectos', 'homelab', 'notas'] as const) {
+      expect(workspaceFromUrl(routeFor(id))).toBe(id);
+    }
   });
 });
