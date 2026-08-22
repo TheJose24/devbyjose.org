@@ -1,0 +1,33 @@
+<dbj-pane title="neofetch">
+  <pre class="ok">{{ ascii }}</pre>
+  <hr class="rule">
+  <dl class="kv">
+    @for (spec of specs; track spec.key) {
+      <dt>{{ spec.key }}</dt>
+      <dd>
+        <span [class.ok]="spec.accent" [class.hi]="spec.key === 'rol'">{{ spec.value }}</span>
+        @if (spec.note) { <span class="dim">· {{ spec.note }}</span> }
+      </dd>
+    }
+  </dl>
+  <div class="swatch">
+    @for (color of palette; track color) { <i [style.background]="color"></i> }
+  </div>
+  <hr class="rule">
+  @for (line of bio; track $index) { <p>{{ line }}</p> }
+  <p class="dim">{{ bioTail }}</p>
+</dbj-pane>
+
+<dbj-pane title="history">
+  <div class="cmd"><b>history</b> | tail</div>
+  <dl class="hist">
+    @for (entry of history; track entry.command) {
+      <dt>{{ entry.when }}</dt>
+      <dd>{{ entry.command }}@if (entry.note) {<em>&nbsp; # {{ entry.note }}</em>}</dd>
+    }
+  </dl>
+</dbj-pane>
+
+<dbj-pane title="zsh">
+  <dbj-zsh />
+</dbj-pane>

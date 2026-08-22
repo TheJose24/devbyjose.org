@@ -42,3 +42,7 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# generado por tools/build-notes.mjs
+/public/notas/
+/src/app/data/notas.json
