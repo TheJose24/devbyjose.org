@@ -12,8 +12,16 @@ export interface ShellLine {
   readonly label?: string;
 }
 
+export interface Borrador {
+  readonly nombre: string;
+  readonly email: string;
+  readonly mensaje: string;
+}
+
 export interface ShellResult {
   readonly lines: readonly ShellLine[];
+  /** Mensaje listo para que la interfaz lo envíe al Worker. */
+  readonly enviar?: Borrador;
   /** Espacio al que debe saltar la interfaz, si el comando lo pide. */
   readonly goto?: WorkspaceId;
   /** Vacía el registro antes de escribir `lines`. */
@@ -32,6 +40,27 @@ interface Command {
 const out = (text: string, tone: Tone = 'text', label?: string): ShellLine => ({ tone, text, label });
 const only = (...lines: ShellLine[]): ShellResult => ({ lines });
 
+/**
+ * Límites del formulario. Los define el Worker, que es la autoridad; aquí se
+ * repiten solo para avisar antes de gastar una petición.
+ * Fuente: `worker/src/validar.ts`.
+ */
+const LIMITES = {
+  nombre: { min: 2, max: 80 },
+  email: { min: 5, max: 160 },
+  mensaje: { min: 20, max: 4000 },
+} as const;
+const EMAIL = /^[^\s@]+@[^\s@.]+\.[^\s@]{2,}$/;
+
+type PasoMail = 'nombre' | 'email' | 'mensaje' | 'confirmar';
+
+const PREGUNTA: Record<PasoMail, string> = {
+  nombre: '¿cómo te llamas?',
+  email: '¿a qué correo te respondo?',
+  mensaje: 'cuéntame (una línea)',
+  confirmar: '¿lo envío? [si/no]',
+};
+
 const ESPACIOS: Record<string, WorkspaceId> = {
   '1': 'inicio', '2': 'proyectos', '3': 'homelab', '4': 'notas',
   inicio: 'inicio', proyectos: 'proyectos', homelab: 'homelab', notas: 'notas',
@@ -44,6 +73,16 @@ const ESPACIOS: Record<string, WorkspaceId> = {
  */
 export class Shell {
   private readonly commands = new Map<string, Command>();
+  private borrador: { paso: PasoMail; nombre: string; email: string; mensaje: string } | null = null;
+
+  /** Etiqueta del prompt: cambia mientras se compone, como haría un shell. */
+  get etiquetaPrompt(): string {
+    return this.borrador ? this.borrador.paso : '';
+  }
+
+  get componiendo(): boolean {
+    return this.borrador !== null;
+  }
 
   constructor() {
     this.register({
@@ -162,6 +201,18 @@ export class Shell {
     });
 
     this.register({
+      name: 'mail',
+      help: 'escribirme sin salir de aquí',
+      run: () => {
+        this.borrador = { paso: 'nombre', nombre: '', email: '', mensaje: '' };
+        return only(
+          out('componiendo un mensaje · :cancelar para salir', 'muted'),
+          out(PREGUNTA.nombre),
+        );
+      },
+    });
+
+    this.register({
       name: 'clear',
       help: 'limpiar la pantalla',
       run: () => ({ lines: [], clear: true }),
@@ -179,6 +230,7 @@ export class Shell {
   run(input: string): ShellResult | null {
     const linea = input.trim();
     if (!linea) return null;
+    if (this.borrador) return this.componer(linea);
 
     const [nombre, ...args] = linea.split(/\s+/);
     const cmd = this.commands.get(nombre.toLowerCase());
@@ -194,8 +246,50 @@ export class Shell {
     ));
   }
 
+  /** Un paso del formulario. Valida antes de avanzar para no gastar una
+   *  petición en algo que el Worker va a rechazar igualmente. */
+  private componer(linea: string): ShellResult {
+    const b = this.borrador!;
+
+    if (linea === ':cancelar') {
+      this.borrador = null;
+      return only(out('mensaje descartado', 'muted'));
+    }
+
+    if (b.paso === 'confirmar') {
+      if (/^(s|si|sí|y|yes)$/i.test(linea)) {
+        const { nombre, email, mensaje } = b;
+        this.borrador = null;
+        return { lines: [out('enviando…', 'muted')], enviar: { nombre, email, mensaje } };
+      }
+      this.borrador = null;
+      return only(out('mensaje descartado', 'muted'));
+    }
+
+    const campo = b.paso;
+    const { min, max } = LIMITES[campo];
+    if (linea.length < min) return only(out(`demasiado corto, mínimo ${min} caracteres`, 'warn'));
+    if (linea.length > max) return only(out(`demasiado largo, máximo ${max} caracteres`, 'warn'));
+    if (campo === 'email' && !EMAIL.test(linea)) {
+      return only(out('eso no parece un correo', 'warn'));
+    }
+
+    b[campo] = campo === 'email' ? linea.toLowerCase() : linea;
+    b.paso = campo === 'nombre' ? 'email' : campo === 'email' ? 'mensaje' : 'confirmar';
+
+    if (b.paso !== 'confirmar') return only(out(PREGUNTA[b.paso]));
+
+    return only(
+      out(b.nombre, 'text', '  de'),
+      out(b.email, 'text', '  correo'),
+      out(b.mensaje, 'text', '  mensaje'),
+      out(PREGUNTA.confirmar),
+    );
+  }
+
   /** Autocompletado con Tab: comandos, y argumentos de `cat` y `cd`. */
   complete(input: string): readonly string[] {
+    if (this.borrador) return [];
     const partes = input.split(/\s+/);
     if (partes.length <= 1) {
       const p = (partes[0] ?? '').toLowerCase();

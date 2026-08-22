@@ -2,7 +2,8 @@ import {
   ChangeDetectionStrategy, Component, ElementRef, inject, signal, viewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { Shell, type ShellLine } from '../../core/shell';
+import { Shell, type Borrador, type ShellLine } from '../../core/shell';
+import { ENDPOINT_CONTACTO } from '../../core/config';
 import { Wm, routeFor } from '../../core/wm';
 
 @Component({
@@ -20,13 +21,15 @@ import { Wm, routeFor } from '../../core/wm';
     </div>
 
     <form class="prompt" (submit)="submit($event)" autocomplete="off">
+      @if (etiqueta()) { <span class="paso">{{ etiqueta() }}</span> }
       <span class="ps1" aria-hidden="true">❯</span>
       <input
         #entrada
         [value]="draft()"
+        [disabled]="enviando()"
         (input)="draft.set($any($event.target).value)"
         (keydown)="onKey($event)"
-        placeholder="help"
+        [placeholder]="etiqueta() ? '' : 'help'"
         spellcheck="false"
         aria-label="línea de comandos">
     </form>
@@ -46,6 +49,8 @@ import { Wm, routeFor } from '../../core/wm';
       margin: 13px -15px -13px;
     }
     .ps1 { color: var(--accent); }
+    .paso { color: var(--amber); }
+    input:disabled { opacity: 0.5; }
     input {
       flex: 1; background: none; border: 0; outline: 0; color: var(--fg-hi);
       font: inherit; caret-color: var(--accent);
@@ -66,6 +71,8 @@ export class Zsh {
   private cursor = 0;
 
   protected readonly draft = signal('');
+  protected readonly etiqueta = signal('');
+  protected readonly enviando = signal(false);
   protected readonly lines = signal<readonly ShellLine[]>([
     { tone: 'muted', text: 'devbyjose 2.0 · escribe help para ver los comandos.' },
   ]);
@@ -86,13 +93,49 @@ export class Zsh {
       result.clear ? [...result.lines] : [...prev, eco, ...result.lines],
     );
 
+    this.etiqueta.set(this.shell.etiquetaPrompt);
+
     if (result.download) this.descargar(result.download);
     if (result.goto) void this.router.navigate([routeFor(result.goto)]);
+    if (result.enviar) void this.enviar(result.enviar);
 
     queueMicrotask(() => {
       const el = this.logEl()?.nativeElement.parentElement;
       if (el) el.scrollTop = el.scrollHeight;
     });
+  }
+
+  /** El intérprete no toca la red: compone el mensaje y lo entrega aquí. */
+  private async enviar(borrador: Borrador): Promise<void> {
+    this.enviando.set(true);
+    try {
+      const res = await fetch(ENDPOINT_CONTACTO, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(borrador),
+      });
+      if (res.ok) {
+        this.escribir('mensaje enviado · te respondo en 24-48 h', 'ok');
+      } else {
+        const detalle = await res.json().catch(() => null);
+        const motivo = (detalle as { motivo?: string } | null)?.motivo;
+        this.escribir(
+          motivo === 'demasiadas-peticiones'
+            ? 'demasiados intentos seguidos, prueba en un minuto'
+            : 'no se pudo enviar · escríbeme a devbyjose@gmail.com',
+          'warn',
+        );
+      }
+    } catch {
+      this.escribir('sin conexión · escríbeme a devbyjose@gmail.com', 'warn');
+    } finally {
+      this.enviando.set(false);
+      queueMicrotask(() => this.inputEl()?.nativeElement.focus());
+    }
+  }
+
+  private escribir(text: string, tone: ShellLine['tone']): void {
+    this.lines.update((prev) => [...prev, { tone, text }]);
   }
 
   protected onKey(e: KeyboardEvent): void {
@@ -114,7 +157,16 @@ export class Zsh {
       this.autocompletar();
       return;
     }
-    if (e.key === 'Escape') this.inputEl()?.nativeElement.blur();
+    if (e.key === 'Escape') {
+      // Estando a medio de un mensaje, Escape lo descarta antes que soltar el foco.
+      if (this.shell.componiendo) {
+        e.preventDefault();
+        this.draft.set(':cancelar');
+        this.submit(new Event('submit'));
+        return;
+      }
+      this.inputEl()?.nativeElement.blur();
+    }
   }
 
   private autocompletar(): void {
