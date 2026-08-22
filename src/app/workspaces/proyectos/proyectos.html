@@ -1,21 +1,21 @@
 <dbj-pane title="ls -la ~/proyectos">
   <div class="cmd"><b>ls</b> -la ~/proyectos</div>
-  <table class="ls">
-    <thead>
-      <tr><th>nombre</th><th>modif</th></tr>
-    </thead>
-    <tbody>
-      @for (p of proyectos; track p.key) {
-        <tr [attr.data-k]="p.key" [class.sel]="seleccionado() === p.key">
-          <td>
-            <button type="button" class="nm enlace" (click)="seleccionar(p.key)">{{ p.archivo }}</button><br>
-            <span class="dimmer" style="font-size: 10px">{{ p.stack }}</span>
-          </td>
-          <td [class.dim]="!p.enVivo" [class.vivo]="p.enVivo">{{ p.modificado }}</td>
-        </tr>
-      }
-    </tbody>
-  </table>
+  <div class="lista">
+    <div class="lista-cab"><span>nombre</span><span>modif</span></div>
+    @for (p of proyectos; track p.key) {
+      <button
+        type="button"
+        class="fila"
+        [class.sel]="seleccionado() === p.key"
+        (click)="seleccionar(p.key)">
+        <span>
+          <span class="nm">{{ p.archivo }}</span>
+          <span class="sub">{{ p.stack }}</span>
+        </span>
+        <span [class]="p.enVivo ? 'ok' : 'der'">{{ p.modificado }}</span>
+      </button>
+    }
+  </div>
   <hr class="rule">
   <p class="dimmer">{{ proyectos.length }} entradas · clic para abrir</p>
 </dbj-pane>
@@ -23,7 +23,7 @@
 <dbj-pane title="cat README">
   <div class="cmd"><b>cat</b> {{ actual().key }}/README.md</div>
   <div class="titulo">{{ actual().titulo }}</div>
-  <p class="sub">{{ actual().resumen }}</p>
+  <p class="sub-res">{{ actual().resumen }}</p>
 
   <hr class="rule">
   <dl class="kv">

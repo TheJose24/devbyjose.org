@@ -37,8 +37,7 @@ import { NOTAS, cuerpoDe, type Nota } from '../../data/notas';
     .cuerpo pre code { color: inherit; }
     .cuerpo :is(blockquote) { margin: 0 0 11px; padding-left: 12px; border-left: 2px solid var(--line-hi); color: var(--dim); }
     .vacio { color: var(--dim); }
-    a.nm { color: var(--accent); }
-    a.nm:hover { opacity: 1; text-decoration: underline; }
+
 
     @media (max-width: 820px) { :host { display: flex; flex-direction: column; } }
   `,

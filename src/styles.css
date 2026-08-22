@@ -81,6 +81,33 @@ pre { margin: 0; font: inherit; white-space: pre; }
 
 .rule { border: 0; border-top: 1px solid var(--line); margin: 11px 0; }
 
+/* listados navegables tipo ls
+   Cada fila es el propio enlace o botón, no una celda con uno dentro: así toda
+   la superficie es pulsable, hay un solo elemento interactivo por fila y el
+   foco de teclado abarca la fila entera. */
+.lista { display: flex; flex-direction: column; }
+.lista-cab,
+.fila {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px; align-items: baseline;
+}
+.lista-cab {
+  padding: 0 9px 7px; color: var(--dimmer); font-size: 10px;
+  letter-spacing: 0.07em; border-bottom: 1px solid var(--line);
+}
+.fila {
+  width: 100%; padding: 9px; border: 0; border-bottom: 1px solid #14191a;
+  background: none; color: inherit; font: inherit; text-align: left;
+  text-decoration: none; cursor: pointer;
+}
+.fila:hover { background: #101415; opacity: 1; }
+.fila.sel { background: var(--accent-soft); }
+.fila:focus-visible { outline: 1px solid var(--accent-line); outline-offset: -1px; }
+.fila .nm { color: var(--accent); }
+.fila:hover .nm { text-decoration: underline; }
+.fila .sub { display: block; margin-top: 2px; color: var(--dimmer); font-size: 10px; }
+.fila .der { color: var(--dim); }
+
 /* tablas tipo ls */
 table.ls { width: 100%; border-collapse: collapse; }
 table.ls th {

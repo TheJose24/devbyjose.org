@@ -18,12 +18,22 @@ describe('Notas', () => {
 
   it('lista todas las notas', async () => {
     const el = (await montar()).nativeElement as HTMLElement;
-    expect(el.querySelectorAll('tbody tr').length).toBe(NOTAS.length);
+    expect(el.querySelectorAll('a.fila').length).toBe(NOTAS.length);
+  });
+
+  it('la fila entera es el enlace, no solo el texto', async () => {
+    const el = (await montar()).nativeElement as HTMLElement;
+    const fila = el.querySelector('a.fila');
+    // El nombre y la fecha viven dentro del propio enlace: toda la superficie
+    // de la fila abre la nota, sin tener que apuntar a las letras.
+    expect(fila?.querySelector('.nm')).toBeTruthy();
+    expect(fila?.querySelector('.der')).toBeTruthy();
+    expect(el.querySelectorAll('a.fila a, a.fila button').length).toBe(0);
   });
 
   it('cada nota es un enlace rastreable a su propia ruta', async () => {
     const el = (await montar()).nativeElement as HTMLElement;
-    const enlaces = [...el.querySelectorAll<HTMLAnchorElement>('tbody a.nm')];
+    const enlaces = [...el.querySelectorAll<HTMLAnchorElement>('a.fila')];
     expect(enlaces.length).toBe(NOTAS.length);
     for (const n of NOTAS) {
       expect(enlaces.some((a) => a.getAttribute('href') === `/notas/${n.slug}`)).toBe(true);
@@ -78,7 +88,7 @@ describe('Notas', () => {
     wm.register('cat nota');
     wm.focus('ls ~/notas');
 
-    ((fixture.nativeElement as HTMLElement).querySelectorAll('tbody a.nm')[1] as HTMLElement).click();
+    ((fixture.nativeElement as HTMLElement).querySelectorAll('a.fila')[1] as HTMLElement).click();
     await fixture.whenStable();
     expect(wm.focused()).toBe('cat nota');
   });
