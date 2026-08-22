@@ -44,5 +44,5 @@ __screenshots__/
 Thumbs.db
 
 # generado por tools/build-notes.mjs
-/public/notas/
+/src/app/data/notas-cuerpos.json
 /src/app/data/notas.json
