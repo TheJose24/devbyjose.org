@@ -1,21 +1,21 @@
 <dbj-pane title="ls ~/notas">
   <div class="cmd"><b>ls</b> ~/notas</div>
-  <table class="ls">
-    <thead>
-      <tr><th>archivo</th><th>fecha</th></tr>
-    </thead>
-    <tbody>
-      @for (n of notas; track n.slug) {
-        <tr [attr.data-k]="n.slug" [class.sel]="actual().slug === n.slug">
-          <td>
-            <a class="nm" [routerLink]="['/notas', n.slug]" (click)="alAbrir()">{{ n.slug }}.md</a><br>
-            <span class="dimmer" style="font-size: 10px">{{ n.tags.join(' · ') }} · {{ n.minutos }} min</span>
-          </td>
-          <td class="dim">{{ n.fecha.slice(5) }}</td>
-        </tr>
-      }
-    </tbody>
-  </table>
+  <div class="lista">
+    <div class="lista-cab"><span>archivo</span><span>fecha</span></div>
+    @for (n of notas; track n.slug) {
+      <a
+        class="fila"
+        [class.sel]="actual().slug === n.slug"
+        [routerLink]="['/notas', n.slug]"
+        (click)="alAbrir()">
+        <span>
+          <span class="nm">{{ n.slug }}.md</span>
+          <span class="sub">{{ n.tags.join(' · ') }} · {{ n.minutos }} min</span>
+        </span>
+        <span class="der">{{ n.fecha.slice(5) }}</span>
+      </a>
+    }
+  </div>
   <hr class="rule">
   <p class="dimmer">{{ notas.length }} entradas</p>
 </dbj-pane>

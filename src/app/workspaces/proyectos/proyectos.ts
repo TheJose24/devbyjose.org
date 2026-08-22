@@ -16,13 +16,8 @@ import { PROYECTOS, type Proyecto } from '../../data/proyectos';
     }
     .por-que { color: var(--dimmer); margin-bottom: 6px; }
     .titulo { font-size: 16px; color: var(--fg-hi); margin-bottom: 7px; }
-    .sub { color: var(--dim); }
+    .sub-res { color: var(--dim); }
     .repo { color: var(--accent); }
-    .enlace {
-      padding: 0; border: 0; background: none; font: inherit;
-      color: var(--accent); cursor: pointer; text-align: left;
-    }
-    .enlace:hover, .enlace:focus-visible { text-decoration: underline; }
     .vivo { color: var(--accent); }
     @media (max-width: 820px) { :host { display: flex; flex-direction: column; } }
   `,
