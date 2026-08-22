@@ -6,9 +6,9 @@
     </thead>
     <tbody>
       @for (n of notas; track n.slug) {
-        <tr [attr.data-k]="n.slug" [class.sel]="actual().slug === n.slug" (click)="abrir(n.slug)">
+        <tr [attr.data-k]="n.slug" [class.sel]="actual().slug === n.slug">
           <td>
-            <span class="nm">{{ n.slug }}.md</span><br>
+            <a class="nm" [routerLink]="['/notas', n.slug]" (click)="alAbrir()">{{ n.slug }}.md</a><br>
             <span class="dimmer" style="font-size: 10px">{{ n.tags.join(' · ') }} · {{ n.minutos }} min</span>
           </td>
           <td class="dim">{{ n.fecha.slice(5) }}</td>

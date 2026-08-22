@@ -6,12 +6,9 @@
     </thead>
     <tbody>
       @for (p of proyectos; track p.key) {
-        <tr
-          [attr.data-k]="p.key"
-          [class.sel]="seleccionado() === p.key"
-          (click)="seleccionar(p.key)">
+        <tr [attr.data-k]="p.key" [class.sel]="seleccionado() === p.key">
           <td>
-            <span class="nm">{{ p.archivo }}</span><br>
+            <button type="button" class="nm enlace" (click)="seleccionar(p.key)">{{ p.archivo }}</button><br>
             <span class="dimmer" style="font-size: 10px">{{ p.stack }}</span>
           </td>
           <td [class.dim]="!p.enVivo" [class.vivo]="p.enVivo">{{ p.modificado }}</td>
