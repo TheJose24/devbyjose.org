@@ -50,3 +50,8 @@ Thumbs.db
 # worker
 /worker/node_modules/
 /worker/.wrangler/
+
+# Instrucciones locales del asistente y config de MCP: útiles en la máquina,
+# ruido en un repo público.
+/CLAUDE.md
+/.mcp.json

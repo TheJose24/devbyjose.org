@@ -3,7 +3,7 @@
    Dirección: gestor de ventanas en mosaico, estética de terminal.
    ══════════════════════════════════════════════════════════════ */
 
-@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap");
+@import "./fuentes.css";
 
 :root {
   --bg: #08090a;
