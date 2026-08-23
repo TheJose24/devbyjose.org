@@ -18,15 +18,16 @@
 
   // El Worker atiende en el mismo dominio que el sitio, así que la petición
   // del formulario no es de origen cruzado para el navegador.
-  // Ambos nombres: el sitio responde en la raíz y en www, y una ruta solo
-  // casa con el host exacto que declara.
+  // Solo www: es el nombre que sirve el sitio y el único con registro DNS.
+  // Una ruta hacia un host que no resuelve no llega a atender nada; cuando el
+  // dominio raíz redirija aquí, el navegador acabará en www de todas formas y
+  // el `Origin` seguirá siendo este.
   "routes": [
-    { "pattern": "devbyjose.org/api/*", "zone_name": "devbyjose.org" },
     { "pattern": "www.devbyjose.org/api/*", "zone_name": "devbyjose.org" }
   ],
 
   "vars": {
-    "ORIGENES_PERMITIDOS": "https://devbyjose.org,https://www.devbyjose.org",
+    "ORIGENES_PERMITIDOS": "https://www.devbyjose.org",
     "DESTINO": "devbyjose@gmail.com",
     "REMITENTE": "formulario@devbyjose.org"
   }
