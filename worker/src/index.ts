@@ -2,9 +2,21 @@ import { EmailMessage } from 'cloudflare:email';
 import { construirMensaje } from './mensaje';
 import { validar } from './validar';
 
+interface Limitador {
+  limit(o: { key: string }): Promise<{ success: boolean }>;
+}
+
 export interface Env {
   readonly CORREO: { send(m: EmailMessage): Promise<void> };
-  readonly LIMITE?: { limit(o: { key: string }): Promise<{ success: boolean }> };
+  /**
+   * Dos ventanas sobre la misma IP. El contador de Cloudflare es aproximado y
+   * de consistencia diferida: medido contra el Worker desplegado, una ráfaga
+   * de ocho peticiones en dos segundos pasó entera con una sola ventana de
+   * 5/60s, y solo empezó a bloquear alrededor de la undécima. La ventana corta
+   * corta la ráfaga; la larga corta el goteo sostenido.
+   */
+  readonly RAFAGA?: Limitador;
+  readonly SOSTENIDO?: Limitador;
   /**
    * Orígenes que pueden llamar, separados por comas. Son varios porque el
    * sitio responde en el dominio raíz y en www: si solo se acepta uno, el
@@ -64,6 +76,15 @@ export default {
       return json({ ok: false, motivo: 'origen' }, 403, origen);
     }
 
+    // Los limitadores van antes de leer y validar el cuerpo: si van después,
+    // quien machaque con peticiones inválidas nunca los toca y sale gratis.
+    const ip = req.headers.get('cf-connecting-ip') ?? 'desconocida';
+    for (const limitador of [env.RAFAGA, env.SOSTENIDO]) {
+      if (!limitador) continue;
+      const { success } = await limitador.limit({ key: ip });
+      if (!success) return json({ ok: false, motivo: 'demasiadas-peticiones' }, 429, origen);
+    }
+
     let cuerpo: unknown;
     try {
       cuerpo = await req.json();
@@ -76,12 +97,6 @@ export default {
       // Al bot se le responde éxito: si ve un error, aprende a esquivar la trampa.
       if (v.motivo === 'trampa') return json({ ok: true }, 202, origen);
       return json({ ok: false, motivo: v.motivo, campo: v.campo }, 422, origen);
-    }
-
-    if (env.LIMITE) {
-      const ip = req.headers.get('cf-connecting-ip') ?? 'desconocida';
-      const { success } = await env.LIMITE.limit({ key: ip });
-      if (!success) return json({ ok: false, motivo: 'demasiadas-peticiones' }, 429, origen);
     }
 
     let crudo: string;
