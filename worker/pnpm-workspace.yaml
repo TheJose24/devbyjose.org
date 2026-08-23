@@ -1,0 +1,10 @@
+# El Worker se despliega con wrangler, no con Pages, así que mantiene su propio
+# árbol de dependencias. Esta marca evita que pnpm lo resuelva contra la raíz
+# del sitio: allí wrangler no pinta nada y alargaría el build de Pages.
+
+# workerd trae el runtime real de Cloudflare y esbuild su binario nativo; sin
+# permitirles el script de instalación no hay ni pruebas ni despliegue.
+allowBuilds:
+  core-js-pure: true
+  esbuild: true
+  workerd: true
