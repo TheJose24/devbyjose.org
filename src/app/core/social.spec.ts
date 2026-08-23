@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Meta } from '@angular/platform-browser';
 import { Social, TARJETAS, claveDeRuta } from './social';
+import { WORKSPACES, routeFor } from './wm';
 
 describe('claveDeRuta', () => {
   it('normaliza la barra final y la raíz', () => {
@@ -21,8 +22,17 @@ describe('claveDeRuta', () => {
 
 describe('TARJETAS', () => {
   it('cubre todas las rutas del navegador', () => {
-    for (const ruta of ['/', '/proyectos', '/homelab', '/notas']) {
-      expect(TARJETAS[ruta]).toBeDefined();
+    // Se deriva de WORKSPACES: un espacio nuevo sin tarjeta hace fallar esto
+    // en vez de publicarse con la tarjeta genérica del inicio.
+    for (const { id } of WORKSPACES) {
+      expect(TARJETAS[routeFor(id)]).toBeDefined();
+    }
+  });
+
+  it('no describe rutas que el sitio no sirve', () => {
+    const espacios = new Set(WORKSPACES.map((w) => routeFor(w.id)));
+    for (const ruta of Object.keys(TARJETAS)) {
+      expect(espacios.has(ruta)).toBe(true);
     }
   });
 

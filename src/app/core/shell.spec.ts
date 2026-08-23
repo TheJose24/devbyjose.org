@@ -1,5 +1,6 @@
 import { Shell } from './shell';
 import { NOTAS } from '../data/notas';
+import { NOTAS_PUBLICADAS } from './wm';
 
 describe('Shell', () => {
   let sh: Shell;
@@ -34,17 +35,25 @@ describe('Shell', () => {
     expect(r.lines[0].tone).toBe('warn');
   });
 
-  it('cat encuentra una nota por slug, con o sin extensión', () => {
+  it.runIf(NOTAS_PUBLICADAS)('cat encuentra una nota por slug, con o sin extensión', () => {
     const slug = NOTAS[0].slug;
     expect(sh.run(`cat ${slug}`)!.lines[0].text).toBe(NOTAS[0].titulo);
     expect(sh.run(`cat ${slug}.md`)!.lines[0].text).toBe(NOTAS[0].titulo);
   });
 
-  it('cat avisa cuando la nota es un borrador', () => {
+  it.runIf(NOTAS_PUBLICADAS)('cat avisa cuando la nota es un borrador', () => {
     const borrador = NOTAS.find((n) => n.borrador);
     if (!borrador) return;
     const r = sh.run(`cat ${borrador.slug}`)!;
     expect(r.lines.some((l) => l.tone === 'warn' && l.text.includes('borrador'))).toBe(true);
+  });
+
+  it.runIf(!NOTAS_PUBLICADAS)('con las notas ocultas no queda ninguna que servir', () => {
+    // El compilador de notas no emite los borradores, así que el bundle ni
+    // siquiera contiene su texto. Y `cat` con un slug de borrador no resuelve.
+    expect(NOTAS.length).toBe(0);
+    const r = sh.run('cat vm-vs-lxc')!;
+    expect(r.lines[0].tone).toBe('warn');
   });
 
   it('cat de un proyecto navega a su espacio', () => {
@@ -57,10 +66,17 @@ describe('Shell', () => {
     expect(sh.run('cat')!.lines[0].text).toContain('uso:');
   });
 
-  it('ls distingue proyectos de notas', () => {
-    expect(sh.run('ls notas')!.lines.length).toBe(NOTAS.length);
+  it('ls lista proyectos y rechaza lo que no existe', () => {
     expect(sh.run('ls')!.lines[0].label).toContain('.');
     expect(sh.run('ls musica')!.lines[0].tone).toBe('warn');
+  });
+
+  it.runIf(NOTAS_PUBLICADAS)('ls notas lista las notas', () => {
+    expect(sh.run('ls notas')!.lines.length).toBe(NOTAS.length);
+  });
+
+  it.runIf(!NOTAS_PUBLICADAS)('con las notas ocultas, ls notas no las lista', () => {
+    expect(sh.run('ls notas')!.lines[0].tone).toBe('warn');
   });
 
   it('clear vacía en vez de acumular', () => {
@@ -148,10 +164,13 @@ describe('Shell', () => {
     it('completa nombres de comando por prefijo', () => {
       expect(sh.complete('c')).toEqual(expect.arrayContaining(['cat', 'cd', 'cv', 'clear', 'contacto']));
     });
-    it('completa argumentos de cat con notas y proyectos', () => {
-      const op = sh.complete('cat ');
-      expect(op.some((o) => o.endsWith('.md'))).toBe(true);
-      expect(op).toContain('healthyme.ms');
+    it('completa argumentos de cat con los proyectos', () => {
+      expect(sh.complete('cat ')).toContain('healthyme.ms');
+    });
+
+    it('el autocompletado solo ofrece notas si están publicadas', () => {
+      const hayNotas = sh.complete('cat ').some((o) => o.endsWith('.md'));
+      expect(hayNotas).toBe(NOTAS_PUBLICADAS);
     });
     it('completa espacios en cd, sin los alias numéricos', () => {
       const op = sh.complete('cd ');

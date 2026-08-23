@@ -83,11 +83,26 @@ for (const file of files) {
 }
 
 index.sort((a, b) => b.fecha.localeCompare(a.fecha));
-await writeFile(OUT_JSON, JSON.stringify(index, null, 2) + '\n', 'utf8');
-await writeFile(OUT_CUERPOS, JSON.stringify(cuerpos, null, 2) + '\n', 'utf8');
 
-const borradores = index.filter((n) => n.borrador).length;
+/**
+ * Los borradores no se emiten.
+ *
+ * No basta con ocultarlos en la interfaz: si el JSON entra en el bundle, el
+ * texto completo viaja al navegador de cualquiera que abra el archivo .js,
+ * aunque ninguna pantalla lo muestre. Se corta aquí, en el origen.
+ *
+ * Para publicar una nota, quita `borrador: true` de su frontmatter.
+ */
+const publicadas = index.filter((n) => !n.borrador);
+const cuerposPublicados = Object.fromEntries(
+  Object.entries(cuerpos).filter(([slug]) => publicadas.some((n) => n.slug === slug)),
+);
+
+await writeFile(OUT_JSON, JSON.stringify(publicadas, null, 2) + '\n', 'utf8');
+await writeFile(OUT_CUERPOS, JSON.stringify(cuerposPublicados, null, 2) + '\n', 'utf8');
+
+const enBorrador = index.length - publicadas.length;
 console.log(
-  `notas: ${index.length} compiladas` +
-  (borradores ? `  (${borradores} en borrador)` : ''),
+  `notas: ${publicadas.length} publicadas` +
+  (enBorrador ? `  (${enBorrador} en borrador, sin emitir)` : ''),
 );
