@@ -35,7 +35,9 @@ function sinComentarios(texto: string): string {
 }
 
 const cfg = JSON.parse(sinComentarios(readFileSync('wrangler.jsonc', 'utf8')));
-const dominio = new URL(cfg.vars.ORIGEN_PERMITIDO).hostname;
+const origenes: string[] = cfg.vars.ORIGENES_PERMITIDOS.split(',').map((o: string) => o.trim());
+/** El primero es el canónico; de ahí sale la zona. */
+const dominio = new URL(origenes[0]).hostname;
 
 describe('wrangler.jsonc', () => {
   it('el remitente vive en el dominio propio', () => {
@@ -49,12 +51,29 @@ describe('wrangler.jsonc', () => {
     expect(cfg.vars.REMITENTE).not.toBe(cfg.vars.DESTINO);
   });
 
-  it('la ruta cuelga del mismo dominio que el origen permitido', () => {
+  it('cada origen permitido tiene su ruta', () => {
     const rutas: { pattern: string; zone_name: string }[] = cfg.routes ?? [];
     expect(rutas.length).toBeGreaterThan(0);
-    for (const r of rutas) {
-      expect(r.pattern.startsWith(dominio)).toBe(true);
+    // Una ruta casa con el host exacto: sin la de www, el formulario devuelve
+    // 404 desde www aunque el CORS lo permita.
+    for (const origen of origenes) {
+      const host = new URL(origen).hostname;
+      expect(rutas.some((r) => r.pattern.startsWith(`${host}/`))).toBe(true);
+    }
+  });
+
+  it('todas las rutas viven en la zona del dominio canónico', () => {
+    for (const r of cfg.routes ?? []) {
       expect(r.zone_name).toBe(dominio);
+      expect(r.pattern.endsWith('/api/*')).toBe(true);
+    }
+  });
+
+  it('los origenes permitidos son https y del mismo dominio', () => {
+    for (const o of origenes) {
+      const u = new URL(o);
+      expect(u.protocol).toBe('https:');
+      expect(u.hostname === dominio || u.hostname.endsWith(`.${dominio}`)).toBe(true);
     }
   });
 
