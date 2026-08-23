@@ -36,15 +36,22 @@ function sinComentarios(texto: string): string {
 
 const cfg = JSON.parse(sinComentarios(readFileSync('wrangler.jsonc', 'utf8')));
 const origenes: string[] = cfg.vars.ORIGENES_PERMITIDOS.split(',').map((o: string) => o.trim());
-/** El primero es el canónico; de ahí sale la zona. */
-const dominio = new URL(origenes[0]).hostname;
+/** El host que sirve el sitio. Puede ser un subdominio, como www. */
+const host = new URL(origenes[0]).hostname;
+/**
+ * La zona del dominio, que no es lo mismo que el host: el sitio vive en
+ * www.ejemplo.org pero el correo y las rutas cuelgan de ejemplo.org.
+ * Se toma de la propia configuración en vez de recortar el host, porque
+ * recortar falla con dominios de dos niveles como .com.pe.
+ */
+const zona: string = cfg.routes[0].zone_name;
 
 describe('wrangler.jsonc', () => {
-  it('el remitente vive en el dominio propio', () => {
+  it('el remitente vive en la zona propia', () => {
     // El binding send_email rechaza cualquier `from` que no pertenezca a una
     // zona de la cuenta con Email Routing activo. Un gmail aquí falla en
     // ejecución, nunca en el despliegue.
-    expect(cfg.vars.REMITENTE.endsWith(`@${dominio}`)).toBe(true);
+    expect(cfg.vars.REMITENTE.endsWith(`@${zona}`)).toBe(true);
   });
 
   it('el destino no se usa como remitente', () => {
@@ -62,19 +69,24 @@ describe('wrangler.jsonc', () => {
     }
   });
 
-  it('todas las rutas viven en la zona del dominio canónico', () => {
+  it('todas las rutas viven en la misma zona y atienden /api', () => {
     for (const r of cfg.routes ?? []) {
-      expect(r.zone_name).toBe(dominio);
+      expect(r.zone_name).toBe(zona);
       expect(r.pattern.endsWith('/api/*')).toBe(true);
     }
   });
 
-  it('los origenes permitidos son https y del mismo dominio', () => {
+  it('los origenes permitidos son https y cuelgan de la zona', () => {
     for (const o of origenes) {
       const u = new URL(o);
       expect(u.protocol).toBe('https:');
-      expect(u.hostname === dominio || u.hostname.endsWith(`.${dominio}`)).toBe(true);
+      expect(u.hostname === zona || u.hostname.endsWith(`.${zona}`)).toBe(true);
     }
+  });
+
+  it('el host canonico tiene ruta propia', () => {
+    const rutas: { pattern: string }[] = cfg.routes ?? [];
+    expect(rutas.some((r) => r.pattern.startsWith(`${host}/`))).toBe(true);
   });
 
   it('el destino de send_email coincide con el buzón que se anuncia', () => {
