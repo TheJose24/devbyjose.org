@@ -92,4 +92,27 @@ describe('wrangler.jsonc', () => {
   it('el destino de send_email coincide con el buzón que se anuncia', () => {
     expect(cfg.send_email[0].destination_address).toBe(cfg.vars.DESTINO);
   });
+
+  it('hay una ventana corta y una larga', () => {
+    const limitadores: { name: string; simple: { limit: number; period: number } }[] =
+      cfg.ratelimits ?? [];
+    // Con una sola ventana de 60 s la ráfaga entra entera: el contador de
+    // Cloudflare es aproximado y tarda en propagarse.
+    expect(limitadores.length).toBeGreaterThanOrEqual(2);
+    expect(limitadores.some((l) => l.simple.period === 10)).toBe(true);
+    expect(limitadores.some((l) => l.simple.period === 60)).toBe(true);
+  });
+
+  it('cada limitador tiene su propio espacio de nombres', () => {
+    const ids = (cfg.ratelimits ?? []).map((l: { namespace_id: string }) => l.namespace_id);
+    // Compartir namespace_id haría que ambos contaran sobre el mismo contador.
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it('la ventana corta es mas estricta que la larga', () => {
+    const limitadores: { simple: { limit: number; period: number } }[] = cfg.ratelimits ?? [];
+    const corta = limitadores.find((l) => l.simple.period === 10)!;
+    const larga = limitadores.find((l) => l.simple.period === 60)!;
+    expect(corta.simple.limit).toBeLessThan(larga.simple.limit);
+  });
 });
