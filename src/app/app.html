@@ -1,0 +1,48 @@
+<div class="wm">
+  <header class="bar">
+    <nav class="ws-list" aria-label="Espacios de trabajo">
+      @for (ws of workspaces; track ws.id) {
+        <button
+          type="button"
+          class="ws-btn"
+          [class.active]="wm.workspace() === ws.id"
+          [attr.aria-current]="wm.workspace() === ws.id ? 'page' : null"
+          (click)="goto(ws.id)">
+          <span class="glyph" aria-hidden="true">●</span>{{ ws.id }}
+        </button>
+      }
+    </nav>
+
+    <div class="bar-title"><b>jose&#64;devbyjose.org</b> <span class="dimmer">—</span> <span class="dim">{{ wm.title() }}</span></div>
+
+    <div class="bar-mod" [title]="hostTitle()">
+      <span class="led" [class]="'led ' + ledClass()"></span>
+      <b>{{ hostLabel() }}</b>
+    </div>
+  </header>
+
+  @if (wm.compact()) {
+    <nav class="tabs" aria-label="Ventanas">
+      @for (tab of wm.tabs(); track tab) {
+        <button
+          type="button"
+          class="tab"
+          [class.on]="wm.focused() === tab"
+          (click)="wm.focus(tab)">{{ tab }}</button>
+      }
+    </nav>
+  }
+
+  <main class="stage" (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)">
+    <router-outlet />
+  </main>
+
+  <footer class="hint">
+    @if (wm.compact()) {
+      <span class="dimmer">desliza para cambiar de ventana</span>
+    } @else {
+      <span><kbd>1</kbd>–<kbd>4</kbd> espacio · <kbd>Tab</kbd> ventana</span>
+      <span class="dimmer">clic en cualquier ventana para enfocarla</span>
+    }
+  </footer>
+</div>
