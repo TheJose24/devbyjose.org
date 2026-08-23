@@ -1,0 +1,13 @@
+# Marca este directorio como raíz de pnpm. Sin esto, pnpm sube por el árbol de
+# directorios, encuentra el pnpm-workspace.yaml del home y resuelve contra él:
+# el lockfile acaba fuera del proyecto y la instalación deja de ser reproducible
+# en otra máquina o en el build de Cloudflare Pages.
+
+# Paquetes cuyos scripts de instalación pueden ejecutarse. pnpm los bloquea por
+# defecto desde la versión 10; todos estos son de la cadena de Angular y sin
+# ellos el build falla al no encontrar el binario nativo de esbuild.
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+  lmdb: true
+  msgpackr-extract: true

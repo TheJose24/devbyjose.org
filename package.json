@@ -1,6 +1,6 @@
 {
   "name": "portafolio",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -43,5 +43,9 @@
     "shiki": "^4.4.3",
     "typescript": "~6.0.2",
     "vitest": "^4.0.8"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=10"
   }
 }
