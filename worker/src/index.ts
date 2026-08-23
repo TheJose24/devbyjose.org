@@ -6,7 +6,14 @@ export interface Env {
   readonly CORREO: { send(m: EmailMessage): Promise<void> };
   readonly LIMITE?: { limit(o: { key: string }): Promise<{ success: boolean }> };
   readonly ORIGEN_PERMITIDO: string;
+  /** Buzón que recibe los avisos del formulario. Verificado en Email Routing. */
   readonly DESTINO: string;
+  /**
+   * Remitente. El binding `send_email` exige que el `from` pertenezca a un
+   * dominio de la cuenta con Email Routing activo: poner aquí un gmail hace
+   * que Cloudflare rechace el envío.
+   */
+  readonly REMITENTE: string;
 }
 
 const json = (cuerpo: unknown, estado: number, origen: string): Response =>
@@ -69,7 +76,7 @@ export default {
 
     const { nombre, email, mensaje } = v.datos;
     const mime = createMimeMessage();
-    mime.setSender({ name: 'www.devbyjose.org', addr: env.DESTINO });
+    mime.setSender({ name: 'formulario devbyjose.org', addr: env.REMITENTE });
     mime.setRecipient(env.DESTINO);
     // Responder al correo escribe a quien rellenó el formulario, no a uno mismo.
     mime.setHeader('Reply-To', `${limpiarCabecera(nombre)} <${limpiarCabecera(email)}>`);
@@ -80,7 +87,7 @@ export default {
     });
 
     try {
-      await env.CORREO.send(new EmailMessage(env.DESTINO, env.DESTINO, mime.asRaw()));
+      await env.CORREO.send(new EmailMessage(env.REMITENTE, env.DESTINO, mime.asRaw()));
     } catch (e) {
       console.error('fallo al enviar', e);
       return json({ ok: false, motivo: 'envio' }, 502, origen);
