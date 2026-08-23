@@ -1,13 +1,18 @@
 {
   "name": "portafolio",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:portafolio": "node dist/portafolio/server/server.mjs"
+    "serve:ssr:portafolio": "node dist/portafolio/server/server.mjs",
+    "notas": "node tools/build-notes.mjs",
+    "prebuild": "pnpm notas",
+    "prestart": "pnpm notas",
+    "pretest": "pnpm notas && pnpm check:limites",
+    "check:limites": "node tools/check-limites.mjs"
   },
   "private": true,
   "packageManager": "pnpm@11.3.0",
@@ -30,8 +35,11 @@
     "@angular/compiler-cli": "^22.1.0",
     "@types/express": "^5.0.1",
     "@types/node": "^20.17.19",
+    "gray-matter": "^4.0.3",
     "jsdom": "^28.0.0",
+    "markdown-it": "^15.0.0",
     "prettier": "^3.8.1",
+    "shiki": "^4.4.3",
     "typescript": "~6.0.2",
     "vitest": "^4.0.8"
   }

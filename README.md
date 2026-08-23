@@ -1,59 +1,69 @@
-# Portafolio
+# devbyjose.org
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.5.
+Mi portafolio, construido como un gestor de ventanas en mosaico dentro del
+navegador: cuatro espacios de trabajo, paneles que se recorren con el teclado y
+un intérprete de comandos que hace de navegación.
 
-## Development server
+Angular 22 sin zonas, prerenderizado a HTML estático y desplegado en Cloudflare
+Pages. El formulario de contacto vive en un Worker aparte.
 
-To start a local development server, run:
+## Por qué está hecho así
 
-```bash
-ng serve
-```
+**Sin zone.js.** Todo el estado son señales, así que el bundle no carga el
+parcheo de APIs del navegador que Angular arrastraba históricamente.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+**Estático de verdad.** Las 8 rutas se prerenderizan en el build. No hay
+servidor que mantener y el sitio no depende de que nada mío esté encendido.
 
-## Code scaffolding
+**El homelab no siempre está encendido**, y el sitio tiene que aguantarlo. Las
+métricas siguen una cadena de tres pasos —API en vivo, caché del navegador,
+snapshot del build— y en todos los casos se muestra la antigüedad del dato. La
+página nunca queda en blanco ni finge estar al día.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+**Las notas se compilan en el build.** `tools/build-notes.mjs` lee el Markdown
+de `content/notas/`, resuelve el frontmatter y colorea el código con Shiki, de
+modo que no viaja al navegador ni un byte de resaltado de sintaxis.
 
-```bash
-ng generate component component-name
-```
+## Estructura
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+| Ruta | Qué hay |
+| --- | --- |
+| `src/app/core/` | Estado del gestor de ventanas, intérprete de comandos y cliente de métricas |
+| `src/app/workspaces/` | Los cuatro espacios: inicio, proyectos, homelab y notas |
+| `src/app/ui/` | Panel y distintivo de antigüedad del dato |
+| `src/app/data/` | Contenido tipado: perfil, topología, proyectos |
+| `content/notas/` | Las notas en Markdown, fuente del pipeline |
+| `tools/` | Compilador de notas y verificador de reglas compartidas |
+| `worker/` | Worker del formulario de contacto, con su propio despliegue |
 
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Desarrollo
 
 ```bash
-ng test
+pnpm install
+pnpm start          # http://localhost:4200
+pnpm test           # 66 pruebas
+pnpm build          # prerenderiza a dist/portafolio/browser
 ```
 
-## Running end-to-end tests
+`pretest` compila las notas y ejecuta `tools/check-limites.mjs`, que compara las
+reglas de validación del formulario entre el cliente y el Worker. Son paquetes
+distintos y no pueden compartir módulo, así que la comprobación evita que se
+separen sin que nadie se entere.
 
-For end-to-end (e2e) testing, run:
+## Despliegue
 
-```bash
-ng e2e
-```
+El sitio va a Cloudflare Pages desde `master`:
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+| Campo | Valor |
+| --- | --- |
+| Build command | `pnpm build` |
+| Output directory | `dist/portafolio/browser` |
 
-## Additional Resources
+El Worker se despliega aparte y atiende en `devbyjose.org/api/*`. Sus
+instrucciones están en [`worker/README.md`](worker/README.md).
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Ramas
+
+`master` solo recibe releases. El trabajo se integra en `develop` y sale por
+ramas `feature/*` y `fix/*`, que se fusionan con `--no-ff` para conservar la
+historia de cada cambio.

@@ -1,1 +1,131 @@
-/* You can add global styles to this file, and also import other style files */
+/* ══════════════════════════════════════════════════════════════
+   devbyjose.org — sistema de diseño
+   Dirección: gestor de ventanas en mosaico, estética de terminal.
+   ══════════════════════════════════════════════════════════════ */
+
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap");
+
+:root {
+  --bg: #08090a;
+  --pane: #0b0d0e;
+  --pane-hi: #0e1112;
+  --line: #1b2022;
+  --line-hi: #2a3336;
+
+  --fg: #c9d1cd;
+  --fg-hi: #eef3ef;
+  --dim: #697570;
+  --dimmer: #465049;
+
+  --accent: #4ade80;
+  --accent-soft: rgba(74, 222, 128, 0.09);
+  --accent-line: rgba(74, 222, 128, 0.34);
+  --amber: #e8b04a;
+  --blue: #58a6ff;
+  --red: #d16060;
+
+  --mono: "JetBrains Mono", "Courier New", monospace;
+
+  --gap: 7px;
+  --radius: 6px;
+  --radius-sm: 3px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.5;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: rgba(74, 222, 128, 0.22); color: var(--fg-hi); }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: #222a2c; border-radius: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+* { scrollbar-width: thin; scrollbar-color: #222a2c transparent; }
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { opacity: 0.75; }
+
+p { margin: 0 0 10px; }
+p:last-child { margin-bottom: 0; }
+
+pre { margin: 0; font: inherit; white-space: pre; }
+
+.ok { color: var(--accent); }
+.amb { color: var(--amber); }
+.blu { color: var(--blue); }
+.red { color: var(--red); }
+.dim { color: var(--dim); }
+.dimmer { color: var(--dimmer); }
+.hi { color: var(--fg-hi); }
+
+/* línea de comando impresa */
+.cmd { color: var(--dim); margin-bottom: 9px; }
+.cmd::before { content: "$ "; color: var(--dimmer); }
+.cmd b { color: var(--accent); font-weight: 400; }
+
+/* lista clave/valor — el formato de neofetch */
+.kv { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 3px 13px; margin: 0; }
+.kv dt { color: var(--dim); }
+.kv dd { margin: 0; color: var(--fg); }
+
+.rule { border: 0; border-top: 1px solid var(--line); margin: 11px 0; }
+
+/* listados navegables tipo ls
+   Cada fila es el propio enlace o botón, no una celda con uno dentro: así toda
+   la superficie es pulsable, hay un solo elemento interactivo por fila y el
+   foco de teclado abarca la fila entera. */
+.lista { display: flex; flex-direction: column; }
+.lista-cab,
+.fila {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px; align-items: baseline;
+}
+.lista-cab {
+  padding: 0 9px 7px; color: var(--dimmer); font-size: 10px;
+  letter-spacing: 0.07em; border-bottom: 1px solid var(--line);
+}
+.fila {
+  width: 100%; padding: 9px; border: 0; border-bottom: 1px solid #14191a;
+  background: none; color: inherit; font: inherit; text-align: left;
+  text-decoration: none; cursor: pointer;
+}
+.fila:hover { background: #101415; opacity: 1; }
+.fila.sel { background: var(--accent-soft); }
+.fila:focus-visible { outline: 1px solid var(--accent-line); outline-offset: -1px; }
+.fila .nm { color: var(--accent); }
+.fila:hover .nm { text-decoration: underline; }
+.fila .sub { display: block; margin-top: 2px; color: var(--dimmer); font-size: 10px; }
+.fila .der { color: var(--dim); }
+
+/* tablas tipo ls */
+table.ls { width: 100%; border-collapse: collapse; }
+table.ls th {
+  text-align: left; font-weight: 400; color: var(--dimmer); font-size: 10px;
+  letter-spacing: 0.07em; padding: 0 9px 7px 0; border-bottom: 1px solid var(--line);
+}
+table.ls td { padding: 7px 9px 7px 0; border-bottom: 1px solid #14191a; vertical-align: top; }
+table.ls tr[data-k] { cursor: pointer; }
+table.ls tr[data-k]:hover td { background: #101415; }
+table.ls tr.sel td { background: var(--accent-soft); }
+table.ls .nm { color: var(--accent); }
+
+@media (max-width: 820px) {
+  body { font-size: 13px; }
+  .kv { grid-template-columns: 82px minmax(0, 1fr); }
+  pre { font-size: 11px; }
+}
+@media (max-width: 400px) {
+  pre { font-size: 10px; }
+  .kv { grid-template-columns: 74px minmax(0, 1fr); }
+}

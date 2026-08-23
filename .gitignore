@@ -42,3 +42,11 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# generado por tools/build-notes.mjs
+/src/app/data/notas-cuerpos.json
+/src/app/data/notas.json
+
+# worker
+/worker/node_modules/
+/worker/.wrangler/

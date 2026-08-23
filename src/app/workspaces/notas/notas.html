@@ -1,0 +1,37 @@
+<dbj-pane title="ls ~/notas">
+  <div class="cmd"><b>ls</b> ~/notas</div>
+  <div class="lista">
+    <div class="lista-cab"><span>archivo</span><span>fecha</span></div>
+    @for (n of notas; track n.slug) {
+      <a
+        class="fila"
+        [class.sel]="actual().slug === n.slug"
+        [routerLink]="['/notas', n.slug]"
+        (click)="alAbrir()">
+        <span>
+          <span class="nm">{{ n.slug }}.md</span>
+          <span class="sub">{{ n.tags.join(' · ') }} · {{ n.minutos }} min</span>
+        </span>
+        <span class="der">{{ n.fecha.slice(5) }}</span>
+      </a>
+    }
+  </div>
+  <hr class="rule">
+  <p class="dimmer">{{ notas.length }} entradas</p>
+</dbj-pane>
+
+<dbj-pane title="cat nota">
+  <div class="cmd"><b>cat</b> {{ actual().slug }}.md</div>
+  <h1 class="titulo">{{ actual().titulo }}</h1>
+  <div class="meta">{{ actual().fecha }} · {{ actual().tags.join(' · ') }} · {{ actual().minutos }} min</div>
+
+  @if (actual().borrador) {
+    <p class="aviso">Esta nota está en borrador: el esqueleto está, falta escribirla.</p>
+  }
+
+  @if (cuerpo(); as html) {
+    <div class="cuerpo" [innerHTML]="html"></div>
+  } @else {
+    <p class="vacio">Sin contenido todavía.</p>
+  }
+</dbj-pane>

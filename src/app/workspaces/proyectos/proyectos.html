@@ -1,0 +1,47 @@
+<dbj-pane title="ls -la ~/proyectos">
+  <div class="cmd"><b>ls</b> -la ~/proyectos</div>
+  <div class="lista">
+    <div class="lista-cab"><span>nombre</span><span>modif</span></div>
+    @for (p of proyectos; track p.key) {
+      <button
+        type="button"
+        class="fila"
+        [class.sel]="seleccionado() === p.key"
+        (click)="seleccionar(p.key)">
+        <span>
+          <span class="nm">{{ p.archivo }}</span>
+          <span class="sub">{{ p.stack }}</span>
+        </span>
+        <span [class]="p.enVivo ? 'ok' : 'der'">{{ p.modificado }}</span>
+      </button>
+    }
+  </div>
+  <hr class="rule">
+  <p class="dimmer">{{ proyectos.length }} entradas · clic para abrir</p>
+</dbj-pane>
+
+<dbj-pane title="cat README">
+  <div class="cmd"><b>cat</b> {{ actual().key }}/README.md</div>
+  <div class="titulo">{{ actual().titulo }}</div>
+  <p class="sub-res">{{ actual().resumen }}</p>
+
+  <hr class="rule">
+  <dl class="kv">
+    @for (d of actual().datos; track d.clave) {
+      <dt>{{ d.clave }}</dt>
+      <dd>
+        <span [class.ok]="d.acento">{{ d.valor }}</span>
+        @if (d.nota) { <span class="dim">· {{ d.nota }}</span> }
+      </dd>
+    }
+  </dl>
+
+  <hr class="rule">
+  <div class="por-que">por qué así</div>
+  <p>{{ actual().porQue }}</p>
+
+  @if (actual().repo; as repo) {
+    <hr class="rule">
+    <div class="repo">→ {{ repo }}</div>
+  }
+</dbj-pane>
