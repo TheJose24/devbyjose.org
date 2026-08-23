@@ -8,6 +8,7 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { Wm, WORKSPACES, routeFor, workspaceFromUrl, type WorkspaceId } from './core/wm';
 import { Homelab } from './core/homelab';
+import { Social } from './core/social';
 
 @Component({
   selector: 'dbj-root',
@@ -20,6 +21,7 @@ export class App implements OnInit {
   protected readonly wm = inject(Wm);
   protected readonly homelab = inject(Homelab);
   private readonly router = inject(Router);
+  private readonly social = inject(Social);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   protected readonly workspaces = WORKSPACES;
@@ -47,6 +49,11 @@ export class App implements OnInit {
   }
 
   ngOnInit(): void {
+    // Antes del corte por plataforma: las etiquetas Open Graph tienen que
+    // quedar escritas durante el prerenderizado, porque los rastreadores de
+    // LinkedIn y WhatsApp leen el HTML estático y no ejecutan JavaScript.
+    this.social.seguirRutas();
+
     if (!this.isBrowser) return;
     this.syncCompact();
     void this.homelab.refresh();
