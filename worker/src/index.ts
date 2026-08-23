@@ -5,7 +5,13 @@ import { limpiarCabecera, validar } from './validar';
 export interface Env {
   readonly CORREO: { send(m: EmailMessage): Promise<void> };
   readonly LIMITE?: { limit(o: { key: string }): Promise<{ success: boolean }> };
-  readonly ORIGEN_PERMITIDO: string;
+  /**
+   * Orígenes que pueden llamar, separados por comas. Son varios porque el
+   * sitio responde en el dominio raíz y en www: si solo se acepta uno, el
+   * formulario falla desde el otro y el navegador no explica por qué.
+   * El primero es el canónico y el que se devuelve cuando no hay `Origin`.
+   */
+  readonly ORIGENES_PERMITIDOS: string;
   /** Buzón que recibe los avisos del formulario. Verificado en Email Routing. */
   readonly DESTINO: string;
   /**
@@ -28,7 +34,12 @@ const json = (cuerpo: unknown, estado: number, origen: string): Response =>
 
 export default {
   async fetch(req: Request, env: Env): Promise<Response> {
-    const origen = env.ORIGEN_PERMITIDO;
+    const permitidos = env.ORIGENES_PERMITIDOS.split(',').map((o) => o.trim()).filter(Boolean);
+    const solicitante = req.headers.get('origin');
+    // Se devuelve el origen que pidió, no una constante: con varios dominios,
+    // responder siempre el mismo hace que el navegador rechace los demás.
+    const permitido = !!solicitante && permitidos.includes(solicitante);
+    const origen = permitido ? solicitante : permitidos[0];
 
     if (req.method === 'OPTIONS') {
       return new Response(null, {
@@ -49,8 +60,7 @@ export default {
 
     // El navegador ya bloquea el origen ajeno por CORS, pero eso no protege de
     // una petición hecha fuera del navegador; se comprueba también aquí.
-    const enviadoDesde = req.headers.get('origin');
-    if (enviadoDesde && enviadoDesde !== origen) {
+    if (solicitante && !permitido) {
       return json({ ok: false, motivo: 'origen' }, 403, origen);
     }
 
