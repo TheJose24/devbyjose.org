@@ -1,6 +1,6 @@
 import { EmailMessage } from 'cloudflare:email';
-import { createMimeMessage } from 'mimetext/browser';
-import { limpiarCabecera, validar } from './validar';
+import { construirMensaje } from './mensaje';
+import { validar } from './validar';
 
 export interface Env {
   readonly CORREO: { send(m: EmailMessage): Promise<void> };
@@ -84,20 +84,19 @@ export default {
       if (!success) return json({ ok: false, motivo: 'demasiadas-peticiones' }, 429, origen);
     }
 
-    const { nombre, email, mensaje } = v.datos;
-    const mime = createMimeMessage();
-    mime.setSender({ name: 'formulario devbyjose.org', addr: env.REMITENTE });
-    mime.setRecipient(env.DESTINO);
-    // Responder al correo escribe a quien rellenó el formulario, no a uno mismo.
-    mime.setHeader('Reply-To', `${limpiarCabecera(nombre)} <${limpiarCabecera(email)}>`);
-    mime.setSubject(`Contacto web · ${limpiarCabecera(nombre)}`);
-    mime.addMessage({
-      contentType: 'text/plain',
-      data: `De: ${nombre} <${email}>\n\n${mensaje}\n`,
-    });
+    let crudo: string;
+    try {
+      crudo = construirMensaje({ ...v.datos, remitente: env.REMITENTE, destino: env.DESTINO });
+    } catch (e) {
+      // Componer el MIME puede lanzar por una cabecera mal formada. Sin este
+      // try la excepción salía sin capturar y Cloudflare devolvía su propia
+      // página de error en vez de nuestro JSON.
+      console.error('fallo al componer el correo', e);
+      return json({ ok: false, motivo: 'envio' }, 502, origen);
+    }
 
     try {
-      await env.CORREO.send(new EmailMessage(env.REMITENTE, env.DESTINO, mime.asRaw()));
+      await env.CORREO.send(new EmailMessage(env.REMITENTE, env.DESTINO, crudo));
     } catch (e) {
       console.error('fallo al enviar', e);
       return json({ ok: false, motivo: 'envio' }, 502, origen);
