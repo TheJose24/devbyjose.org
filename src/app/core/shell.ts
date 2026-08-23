@@ -1,4 +1,5 @@
 import { NOTAS, buscarNota } from '../data/notas';
+import { NOTAS_PUBLICADAS } from './wm';
 import { PROYECTOS, buscarProyecto } from '../data/proyectos';
 import { HISTORY } from '../data/profile';
 import type { WorkspaceId } from './wm';
@@ -62,8 +63,10 @@ const PREGUNTA: Record<PasoMail, string> = {
 };
 
 const ESPACIOS: Record<string, WorkspaceId> = {
-  '1': 'inicio', '2': 'proyectos', '3': 'homelab', '4': 'notas',
-  inicio: 'inicio', proyectos: 'proyectos', homelab: 'homelab', notas: 'notas',
+  '1': 'inicio', '2': 'proyectos', '3': 'homelab',
+  inicio: 'inicio', proyectos: 'proyectos', homelab: 'homelab',
+  // `notas` solo existe como destino cuando el espacio está publicado.
+  ...(NOTAS_PUBLICADAS ? { '4': 'notas' as const, notas: 'notas' as const } : {}),
 };
 
 /**
@@ -110,11 +113,11 @@ export class Shell {
 
     this.register({
       name: 'ls',
-      args: '[proyectos|notas]',
-      help: 'listar proyectos o notas',
+      args: NOTAS_PUBLICADAS ? '[proyectos|notas]' : '[proyectos]',
+      help: NOTAS_PUBLICADAS ? 'listar proyectos o notas' : 'listar proyectos',
       run: (args) => {
         const que = (args[0] ?? 'proyectos').replace(/^~\//, '');
-        if (que.startsWith('nota')) {
+        if (NOTAS_PUBLICADAS && que.startsWith('nota')) {
           return only(...NOTAS.map((n) =>
             out(`${n.resumen.slice(0, 54)}…`, 'text', `${n.slug}.md`)));
         }
@@ -128,12 +131,12 @@ export class Shell {
     this.register({
       name: 'cat',
       args: '<archivo>',
-      help: 'leer una nota o un proyecto',
+      help: NOTAS_PUBLICADAS ? 'leer una nota o un proyecto' : 'leer un proyecto',
       run: (args) => {
         const termino = args[0];
         if (!termino) return only(out('uso: cat <archivo>', 'warn'));
 
-        const nota = buscarNota(termino);
+        const nota = NOTAS_PUBLICADAS ? buscarNota(termino) : undefined;
         if (nota) {
           return only(
             out(nota.titulo, 'ok'),
@@ -299,7 +302,7 @@ export class Shell {
     const arg = partes[partes.length - 1].toLowerCase();
     if (cmd === 'cat') {
       return [
-        ...NOTAS.map((n) => `${n.slug}.md`),
+        ...(NOTAS_PUBLICADAS ? NOTAS.map((n) => `${n.slug}.md`) : []),
         ...PROYECTOS.map((p) => p.archivo),
       ].filter((c) => c.startsWith(arg));
     }

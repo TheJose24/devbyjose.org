@@ -7,12 +7,23 @@ export interface WorkspaceMeta {
   readonly path: string;
 }
 
+/**
+ * Las notas siguen en borrador y el sitio ya está publicado, así que el espacio
+ * se oculta entero: sin pestaña, sin ruta y sin comandos. Publicar una sección
+ * vacía cuesta más credibilidad de la que da tenerla.
+ *
+ * Para reactivarlo basta poner esto en `true`: el código sigue completo y con
+ * sus pruebas. También hay que quitar `borrador: true` de las notas que estén
+ * listas, o la lista saldrá vacía igualmente.
+ */
+export const NOTAS_PUBLICADAS = false;
+
 export const WORKSPACES: readonly WorkspaceMeta[] = [
   { id: 'inicio', path: '~/inicio' },
   { id: 'proyectos', path: '~/proyectos' },
   { id: 'homelab', path: '~/homelab' },
-  { id: 'notas', path: '~/notas' },
-] as const;
+  ...(NOTAS_PUBLICADAS ? [{ id: 'notas' as const, path: '~/notas' }] : []),
+];
 
 /**
  * Estado del gestor de ventanas.

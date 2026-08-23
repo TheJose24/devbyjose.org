@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Location } from '@angular/common';
 import { App } from './app';
-import { Wm, routeFor, workspaceFromUrl } from './core/wm';
+import { WORKSPACES, Wm, routeFor, workspaceFromUrl } from './core/wm';
 import { ago } from './core/homelab';
 
 describe('App', () => {
@@ -41,7 +41,9 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const botones = (fixture.nativeElement as HTMLElement).querySelectorAll('.ws-btn');
-    expect(botones.length).toBe(4);
+    // Contra WORKSPACES y no contra un número fijo: así la prueba sigue
+    // valiendo cuando un espacio se oculta o se vuelve a publicar.
+    expect(botones.length).toBe(WORKSPACES.length);
     expect(botones[0].textContent).toContain('inicio');
   });
 });
@@ -103,8 +105,16 @@ describe('correspondencia entre ruta y espacio', () => {
   it('workspaceFromUrl reconoce el primer segmento', () => {
     expect(workspaceFromUrl('/')).toBe('inicio');
     expect(workspaceFromUrl('/proyectos')).toBe('proyectos');
-    expect(workspaceFromUrl('/notas/vllm-doble-gpu')).toBe('notas');
     expect(workspaceFromUrl('/homelab?x=1#y')).toBe('homelab');
+  });
+
+  it('una ruta de un espacio oculto cae en inicio', () => {
+    // Con las notas ocultas, /notas ya no existe y el comodín redirige.
+    if (WORKSPACES.some((w) => w.id === 'notas')) {
+      expect(workspaceFromUrl('/notas/vllm-doble-gpu')).toBe('notas');
+    } else {
+      expect(workspaceFromUrl('/notas/vllm-doble-gpu')).toBe('inicio');
+    }
   });
 
   it('lo desconocido cae en inicio', () => {
@@ -113,7 +123,7 @@ describe('correspondencia entre ruta y espacio', () => {
   });
 
   it('ida y vuelta para todos los espacios', () => {
-    for (const id of ['inicio', 'proyectos', 'homelab', 'notas'] as const) {
+    for (const { id } of WORKSPACES) {
       expect(workspaceFromUrl(routeFor(id))).toBe(id);
     }
   });
