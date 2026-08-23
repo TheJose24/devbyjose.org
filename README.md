@@ -55,6 +55,15 @@ pnpm build          # prerenderiza a dist/portafolio/browser
   dominio. Un `@import` a Google Fonts no molesta en desarrollo —Angular lo
   incrusta al compilar— pero el día que Google no responde revienta el build y
   el despliegue se cae por algo ajeno al proyecto.
+- **`check-node.mjs`** compara `engines.node` y `.node-version` con la versión
+  que exige el CLI de Angular. Escribir el rango a mano ya provocó un
+  despliegue fallido: decía `>=22.0.0`, Cloudflare eligió 22.16.0 y Angular
+  pedía 22.22.3. Este también corre en `prebuild`, así que falla en el primer
+  segundo del build y no a mitad.
+
+La versión de Node del despliegue se fija en `.node-version`, no en una
+variable de entorno del panel: así viaja con el repositorio y se revisa en el
+mismo commit que el código.
 
 ## Despliegue
 
