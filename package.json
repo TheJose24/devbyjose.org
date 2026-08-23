@@ -9,11 +9,12 @@
     "test": "ng test",
     "serve:ssr:portafolio": "node dist/portafolio/server/server.mjs",
     "notas": "node tools/build-notes.mjs",
-    "prebuild": "pnpm notas",
+    "prebuild": "pnpm check:node && pnpm notas",
     "prestart": "pnpm notas",
-    "pretest": "pnpm notas && pnpm check:limites && pnpm check:fuentes",
+    "pretest": "pnpm check:node && pnpm notas && pnpm check:limites && pnpm check:fuentes",
     "check:limites": "node tools/check-limites.mjs",
-    "check:fuentes": "node tools/check-fuentes.mjs"
+    "check:fuentes": "node tools/check-fuentes.mjs",
+    "check:node": "node tools/check-node.mjs"
   },
   "private": true,
   "packageManager": "pnpm@11.3.0",
@@ -45,7 +46,7 @@
     "vitest": "^4.0.8"
   },
   "engines": {
-    "node": ">=22.0.0",
+    "node": "^22.22.3 || ^24.15.0 || >=26.0.0",
     "pnpm": ">=10"
   }
 }
