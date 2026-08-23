@@ -1,11 +1,15 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="utf-8">
   <title>Portafolio</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <!-- Solo el peso normal: es el que pinta casi todo el texto. Sin esto la
+       petición de la fuente no arranca hasta que el navegador analiza el CSS. -->
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+        href="/fonts/jetbrains-mono-400-latin.woff2">
 </head>
 <body>
   <dbj-root></dbj-root>

@@ -33,7 +33,8 @@ modo que no viaja al navegador ni un byte de resaltado de sintaxis.
 | `src/app/ui/` | Panel y distintivo de antigüedad del dato |
 | `src/app/data/` | Contenido tipado: perfil, topología, proyectos |
 | `content/notas/` | Las notas en Markdown, fuente del pipeline |
-| `tools/` | Compilador de notas y verificador de reglas compartidas |
+| `tools/` | Compilador de notas y verificaciones del build |
+| `public/fonts/` | JetBrains Mono servida desde el propio dominio |
 | `worker/` | Worker del formulario de contacto, con su propio despliegue |
 
 ## Desarrollo
@@ -45,10 +46,15 @@ pnpm test           # 66 pruebas
 pnpm build          # prerenderiza a dist/portafolio/browser
 ```
 
-`pretest` compila las notas y ejecuta `tools/check-limites.mjs`, que compara las
-reglas de validación del formulario entre el cliente y el Worker. Son paquetes
-distintos y no pueden compartir módulo, así que la comprobación evita que se
-separen sin que nadie se entere.
+`pretest` compila las notas y ejecuta dos comprobaciones:
+
+- **`check-limites.mjs`** compara las reglas de validación del formulario entre
+  el cliente y el Worker. Son paquetes distintos y no pueden compartir módulo,
+  así que esto evita que se separen sin que nadie se entere.
+- **`check-fuentes.mjs`** exige que las fuentes se sirvan desde el propio
+  dominio. Un `@import` a Google Fonts no molesta en desarrollo —Angular lo
+  incrusta al compilar— pero el día que Google no responde revienta el build y
+  el despliegue se cae por algo ajeno al proyecto.
 
 ## Despliegue
 

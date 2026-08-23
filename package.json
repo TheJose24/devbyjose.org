@@ -1,6 +1,6 @@
 {
   "name": "portafolio",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -11,8 +11,9 @@
     "notas": "node tools/build-notes.mjs",
     "prebuild": "pnpm notas",
     "prestart": "pnpm notas",
-    "pretest": "pnpm notas && pnpm check:limites",
-    "check:limites": "node tools/check-limites.mjs"
+    "pretest": "pnpm notas && pnpm check:limites && pnpm check:fuentes",
+    "check:limites": "node tools/check-limites.mjs",
+    "check:fuentes": "node tools/check-fuentes.mjs"
   },
   "private": true,
   "packageManager": "pnpm@11.3.0",
