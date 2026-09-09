@@ -65,11 +65,11 @@ describe('Social', () => {
     expect(meta.getTag('property="og:url"')?.content).toBe('https://www.devbyjose.org/homelab');
   });
 
-  it('usa la imagen propia de la ruta cuando existe', () => {
+  it('usa la imagen general cuando la ruta no define una propia', () => {
     const { social, meta } = montar();
     social.aplicar('/homelab');
     expect(meta.getTag('property="og:image"')?.content).toBe(
-      'https://www.devbyjose.org/og-homelab.png',
+      'https://www.devbyjose.org/og.png',
     );
   });
 

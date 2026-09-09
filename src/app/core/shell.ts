@@ -106,8 +106,8 @@ export class Shell {
       name: 'whoami',
       help: 'quién soy',
       run: () => only(
-        out('Desarrollador Full Stack. Java y Spring Boot en el backend, Angular en el frontend.'),
-        out('Administro mi propia infraestructura y sirvo modelos de lenguaje sobre GPU.', 'muted'),
+        out('Software Engineer · Java & Full Stack. Java y Spring Boot en el backend, Angular en el frontend.'),
+        out('Trabajo con infraestructura interna de inferencia de LLMs con vLLM sobre NVIDIA multi-GPU.', 'muted'),
       ),
     });
 

@@ -47,6 +47,13 @@ Thumbs.db
 /src/app/data/notas-cuerpos.json
 /src/app/data/notas.json
 
+# Borrador local con información interna; no versionar ni publicar.
+/content/notas/2026-08-14-vllm-metricas.md
+
+# Borradores editoriales locales; retirar estas reglas cuando estén listos.
+/content/notas/2026-05-09-vm-vs-lxc.md
+/content/notas/2026-07-02-cloudflare-tunnels.md
+
 # worker
 /worker/node_modules/
 /worker/.wrangler/

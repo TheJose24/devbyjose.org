@@ -7,7 +7,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { Wm, WORKSPACES, routeFor, workspaceFromUrl, type WorkspaceId } from './core/wm';
-import { Homelab } from './core/homelab';
 import { Social } from './core/social';
 
 @Component({
@@ -19,7 +18,6 @@ import { Social } from './core/social';
 })
 export class App implements OnInit {
   protected readonly wm = inject(Wm);
-  protected readonly homelab = inject(Homelab);
   private readonly router = inject(Router);
   private readonly social = inject(Social);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
@@ -28,7 +26,7 @@ export class App implements OnInit {
   private touchX = 0;
   private touchY = 0;
 
-  protected readonly ledClass = signal('on');
+  protected readonly ledClass = signal('stale');
 
   /** La URL manda sobre el espacio activo: así el resaltado de la barra, los
    *  enlaces directos y el botón de atrás del navegador coinciden siempre. */
@@ -41,10 +39,6 @@ export class App implements OnInit {
   );
 
   constructor() {
-    effect(() => {
-      const mode = this.homelab.mode();
-      this.ledClass.set(mode === 'live' ? 'on' : mode === 'snapshot' ? 'stale' : 'off');
-    });
     effect(() => this.wm.goto(workspaceFromUrl(this.url())));
   }
 
@@ -56,7 +50,6 @@ export class App implements OnInit {
 
     if (!this.isBrowser) return;
     this.syncCompact();
-    void this.homelab.refresh();
   }
 
   protected goto(id: WorkspaceId): void {
@@ -64,18 +57,11 @@ export class App implements OnInit {
   }
 
   protected hostLabel(): string {
-    const mode = this.homelab.mode();
-    if (mode === 'live') return 'homelab activo';
-    if (mode === 'snapshot') return 'homelab dormido';
-    return 'homelab';
+    return 'homelab bajo demanda';
   }
 
-  /** Fecha absoluta a propósito: una relativa se congelaría en el HTML durante
-   *  el prerenderizado y mentiría hasta que hidrate. */
   protected hostTitle(): string {
-    const s = this.homelab.status();
-    if (this.homelab.mode() === 'live') return 'El homelab responde ahora mismo';
-    return `Último registro: ${s.generatedAt.slice(0, 16).replace('T', ' ')}`;
+    return 'Infraestructura personal encendida según necesidad';
   }
 
   @HostListener('window:resize')

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Pane } from '../../ui/pane';
 import { Estado } from '../../ui/estado';
 import { Homelab as HomelabService } from '../../core/homelab';
@@ -40,20 +40,4 @@ export class HomelabWs {
   protected readonly topologia = TOPOLOGIA;
   protected readonly estado = this.homelab.status;
 
-  /**
-   * «4h 29m» o «12d 06:22» → cifra, unidad y resto, para darle a cada parte un
-   * tamaño distinto. El servidor se apaga, así que el uptime puede ser de horas
-   * y el formato tiene que aguantarlo igual que el de días.
-   */
-  protected readonly uptime = computed(() => {
-    const m = /^(\d+)\s*([a-z]+)\s*(.*)$/i.exec(this.estado().uptimePretty.trim());
-    if (!m) return { valor: this.estado().uptimePretty, unidad: '', resto: '' };
-    return { valor: m[1], unidad: m[2], resto: m[3] };
-  });
-
-  /** Porcentaje de RAM ocupada en el host. */
-  protected readonly ram = computed(() => {
-    const { usadaGi, totalGi } = this.estado().ram;
-    return totalGi > 0 ? Math.round((usadaGi / totalGi) * 100) : 0;
-  });
 }
