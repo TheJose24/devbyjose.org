@@ -1,0 +1,55 @@
+<dbj-pane title="homelab --topology">
+  <div class="cmd"><b>homelab</b> --topology</div>
+  <div class="topo">
+    @for (nodo of topologia; track $index) {
+      <div class="nodo">
+        <span class="rama">{{ nodo.rama }}</span>
+        @if (nodo.texto) {
+          <span class="etiqueta" [class]="nodo.tono ?? ''">{{ nodo.texto }}</span>
+        }
+        @if (nodo.nota) { <span class="nota">{{ nodo.nota }}</span> }
+      </div>
+    }
+  </div>
+  <hr class="rule">
+  <p class="dim">
+    Los servicios web seleccionados se publican mediante Cloudflare Tunnel, sin
+    port forwarding desde Internet. El acceso remoto privado utiliza Tailscale.
+  </p>
+</dbj-pane>
+
+<dbj-pane title="operación" [foot]="true">
+  <div class="cmd"><b>homelab</b> --public-summary</div>
+  <table class="ls">
+    <thead>
+      <tr><th>área</th><th>descripción</th></tr>
+    </thead>
+    <tbody>
+      @for (s of estado().services; track s.name) {
+        <tr>
+          <td class="nm">{{ s.name }}</td>
+          <td>{{ s.detail }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  <dbj-estado pane-foot />
+</dbj-pane>
+
+<dbj-pane title="criterio" [foot]="true">
+  <div class="cmd"><b>homelab</b> --operating-model</div>
+  <div class="grande">bajo demanda</div>
+  <p class="dim nota-uptime">
+    La infraestructura se enciende cuando hace falta. Esta vista describe el
+    enfoque técnico y no publica datos operativos ni promete disponibilidad.
+  </p>
+  <hr class="rule">
+  <dl class="kv">
+    <dt>hipervisor</dt><dd>Proxmox VE</dd>
+    <dt>aislamiento</dt><dd>VM · LXC · Docker</dd>
+    <dt>acceso</dt><dd>Tailscale</dd>
+    <dt>publicación</dt><dd>Cloudflare Tunnel <span class="dim">· servicios web seleccionados</span></dd>
+    <dt>red</dt><dd>sin exposición directa de puertos WAN</dd>
+  </dl>
+  <dbj-estado pane-foot />
+</dbj-pane>

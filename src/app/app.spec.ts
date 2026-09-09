@@ -3,7 +3,6 @@ import { provideRouter } from '@angular/router';
 import { Location } from '@angular/common';
 import { App } from './app';
 import { WORKSPACES, Wm, routeFor, workspaceFromUrl } from './core/wm';
-import { ago } from './core/homelab';
 
 describe('App', () => {
   beforeEach(async () => {
@@ -84,18 +83,6 @@ describe('Wm', () => {
   });
 });
 
-describe('ago', () => {
-  const base = Date.parse('2026-08-22T12:00:00Z');
-  it('minutos, horas y días', () => {
-    expect(ago('2026-08-22T11:30:00Z', base)).toBe('hace 30 min');
-    expect(ago('2026-08-22T09:00:00Z', base)).toBe('hace 3 h');
-    expect(ago('2026-08-20T12:00:00Z', base)).toBe('hace 2 d');
-  });
-  it('devuelve null si la fecha no es válida', () => {
-    expect(ago('no-es-una-fecha', base)).toBeNull();
-  });
-});
-
 describe('correspondencia entre ruta y espacio', () => {
   it('routeFor deja inicio en la raíz', () => {
     expect(routeFor('inicio')).toBe('/');
@@ -111,9 +98,9 @@ describe('correspondencia entre ruta y espacio', () => {
   it('una ruta de un espacio oculto cae en inicio', () => {
     // Con las notas ocultas, /notas ya no existe y el comodín redirige.
     if (WORKSPACES.some((w) => w.id === 'notas')) {
-      expect(workspaceFromUrl('/notas/vllm-doble-gpu')).toBe('notas');
+      expect(workspaceFromUrl('/notas/nota-de-ejemplo')).toBe('notas');
     } else {
-      expect(workspaceFromUrl('/notas/vllm-doble-gpu')).toBe('inicio');
+      expect(workspaceFromUrl('/notas/nota-de-ejemplo')).toBe('inicio');
     }
   });
 
