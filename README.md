@@ -12,13 +12,13 @@ Pages. El formulario de contacto vive en un Worker aparte.
 **Sin zone.js.** Todo el estado son señales, así que el bundle no carga el
 parcheo de APIs del navegador que Angular arrastraba históricamente.
 
-**Estático de verdad.** Las 8 rutas se prerenderizan en el build. No hay
+**Estático de verdad.** Las rutas públicas se prerenderizan en el build. No hay
 servidor que mantener y el sitio no depende de que nada mío esté encendido.
 
-**El homelab no siempre está encendido**, y el sitio tiene que aguantarlo. Las
-métricas siguen una cadena de tres pasos —API en vivo, caché del navegador,
-snapshot del build— y en todos los casos se muestra la antigüedad del dato. La
-página nunca queda en blanco ni finge estar al día.
+**El homelab no siempre está encendido**, por eso el sitio publica una vista
+arquitectónica generalizada en lugar de depender de datos operativos en vivo. Muestra
+las tecnologías y el modelo operativo sin exponer capacidades, identificadores
+ni la lista interna de servicios.
 
 **Las notas se compilan en el build.** `tools/build-notes.mjs` lee el Markdown
 de `content/notas/`, resuelve el frontmatter y colorea el código con Shiki, de
@@ -28,9 +28,9 @@ modo que no viaja al navegador ni un byte de resaltado de sintaxis.
 
 | Ruta | Qué hay |
 | --- | --- |
-| `src/app/core/` | Estado del gestor de ventanas, intérprete de comandos y cliente de métricas |
+| `src/app/core/` | Estado del gestor de ventanas, intérprete de comandos y metadatos sociales |
 | `src/app/workspaces/` | Los cuatro espacios: inicio, proyectos, homelab y notas |
-| `src/app/ui/` | Panel y distintivo de antigüedad del dato |
+| `src/app/ui/` | Paneles y contexto de la vista pública |
 | `src/app/data/` | Contenido tipado: perfil, topología, proyectos |
 | `content/notas/` | Las notas en Markdown, fuente del pipeline |
 | `tools/` | Compilador de notas y verificaciones del build |
@@ -42,9 +42,17 @@ modo que no viaja al navegador ni un byte de resaltado de sintaxis.
 ```bash
 pnpm install
 pnpm start          # http://localhost:4200
-pnpm test           # 66 pruebas
+pnpm test           # suite Angular
+pnpm --dir worker test  # suite del Worker
 pnpm build          # prerenderiza a dist/portafolio/browser
 ```
+
+La ejecución actual recoge **111 casos: 97 aprobados y 14 omitidos**. Son dos
+casos menos que la auditoría anterior porque se retiraron las pruebas del helper
+de antigüedad que dejó de usarse al eliminar el estado en vivo del homelab. Los
+omitidos pertenecen a pruebas de la sección de notas que se ejecutan solo cuando
+existe al menos una nota publicada; actualmente todas están marcadas como
+borrador y el compilador las excluye del bundle.
 
 `pretest` compila las notas y ejecuta dos comprobaciones:
 
@@ -74,7 +82,7 @@ El sitio va a Cloudflare Pages desde `master`:
 | Build command | `pnpm build` |
 | Output directory | `dist/portafolio/browser` |
 
-El Worker se despliega aparte y atiende en `devbyjose.org/api/*`. Sus
+El Worker se despliega aparte y atiende en `https://www.devbyjose.org/api/*`. Sus
 instrucciones están en [`worker/README.md`](worker/README.md).
 
 ## Ramas
