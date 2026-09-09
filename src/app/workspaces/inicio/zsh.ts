@@ -11,7 +11,7 @@ import { Wm, routeFor } from '../../core/wm';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'zsh' },
   template: `
-    <div class="log" #log>
+    <div class="log" #log role="log" aria-live="polite" aria-relevant="additions text">
       @for (line of lines(); track $index) {
         <div class="line" [class]="'line ' + line.tone">
           @if (line.label) { <span class="label">{{ line.label }}</span> }
@@ -31,7 +31,7 @@ import { Wm, routeFor } from '../../core/wm';
         (keydown)="onKey($event)"
         [placeholder]="etiqueta() ? '' : 'help'"
         spellcheck="false"
-        aria-label="línea de comandos">
+        [attr.aria-label]="etiqueta() ? 'Terminal: ' + etiqueta() : 'Línea de comandos'">
     </form>
   `,
   styles: `
@@ -150,10 +150,8 @@ export class Zsh {
       else { this.cursor = this.historial.length; this.draft.set(''); }
       return;
     }
-    if (e.key === 'Tab') {
-      // Tab dentro del prompt autocompleta; fuera, el gestor rota de ventana.
+    if (e.ctrlKey && e.key === ' ') {
       e.preventDefault();
-      e.stopPropagation();
       this.autocompletar();
       return;
     }
@@ -165,7 +163,6 @@ export class Zsh {
         this.submit(new Event('submit'));
         return;
       }
-      this.inputEl()?.nativeElement.blur();
     }
   }
 

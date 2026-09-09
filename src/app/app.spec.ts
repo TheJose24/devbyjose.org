@@ -2,12 +2,13 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Location } from '@angular/common';
 import { App } from './app';
-import { WORKSPACES, Wm, routeFor, workspaceFromUrl } from './core/wm';
+import { Inicio } from './workspaces/inicio/inicio';
+import { WORKSPACES, Wm, panelId, routeFor, workspaceFromUrl } from './core/wm';
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [App],
+      imports: [App, Inicio],
       providers: [provideRouter([
         { path: '', children: [] },
         { path: 'proyectos', children: [] },
@@ -15,8 +16,50 @@ describe('App', () => {
     }).compileComponents();
   });
 
-  it('se crea', () => {
-    expect(TestBed.createComponent(App).componentInstance).toBeTruthy();
+  it('se crea, expone las acciones principales y no intercepta Tab', async () => {
+    const app = TestBed.createComponent(App);
+    const inicio = TestBed.createComponent(Inicio);
+    await Promise.all([app.whenStable(), inicio.whenStable()]);
+
+    expect(app.componentInstance).toBeTruthy();
+
+    const el = inicio.nativeElement as HTMLElement;
+    const headings = el.querySelectorAll('h1');
+    expect(headings.length).toBe(1);
+    expect(headings[0].textContent).toContain('José Sánchez');
+    expect(el.querySelector('pre')?.getAttribute('aria-hidden')).toBe('true');
+
+    const acciones = [...el.querySelectorAll<HTMLAnchorElement>('.acciones a')];
+    expect(acciones.map((a) => a.textContent?.trim())).toEqual([
+      'Ver proyectos', 'Descargar CV', 'GitHub', 'LinkedIn', 'Email',
+    ]);
+    expect(acciones[1].getAttribute('href')).toBe('/cv.pdf');
+    expect(acciones[2].href).toBe('https://github.com/TheJose24');
+    expect(acciones[3].href).toBe('https://www.linkedin.com/in/devbyjose');
+
+    const tab = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+    el.querySelector('input')?.dispatchEvent(tab);
+    expect(tab.defaultPrevented).toBe(false);
+
+    const tabGlobal = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
+    window.dispatchEvent(tabGlobal);
+    expect(tabGlobal.defaultPrevented).toBe(false);
+
+    for (const key of ['Enter', ' ', 'Escape']) {
+      const standardKey = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true });
+      window.dispatchEvent(standardKey);
+      expect(standardKey.defaultPrevented).toBe(false);
+    }
+
+    const shiftTab = new KeyboardEvent('keydown', {
+      key: 'Tab', shiftKey: true, bubbles: true, cancelable: true,
+    });
+    el.querySelector('input')?.dispatchEvent(shiftTab);
+    expect(shiftTab.defaultPrevented).toBe(false);
+
+    const appEl = app.nativeElement as HTMLElement;
+    expect(appEl.querySelector('.skip-link')?.getAttribute('href')).toBe('#contenido-principal');
+    expect((app.nativeElement as HTMLElement).querySelector('main#contenido-principal')).toBeTruthy();
   });
 
   it('resalta en la barra el espacio de la ruta actual', async () => {
@@ -36,14 +79,35 @@ describe('App', () => {
     expect(el.querySelector('.ws-btn.active')?.textContent).toContain('proyectos');
   });
 
-  it('pinta un botón por espacio de trabajo', async () => {
+  it('pinta un enlace por espacio y pestañas compactas relacionadas con sus paneles', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
-    const botones = (fixture.nativeElement as HTMLElement).querySelectorAll('.ws-btn');
+    const el = fixture.nativeElement as HTMLElement;
+    const enlaces = el.querySelectorAll<HTMLAnchorElement>('a.ws-btn');
     // Contra WORKSPACES y no contra un número fijo: así la prueba sigue
     // valiendo cuando un espacio se oculta o se vuelve a publicar.
-    expect(botones.length).toBe(WORKSPACES.length);
-    expect(botones[0].textContent).toContain('inicio');
+    expect(enlaces.length).toBe(WORKSPACES.length);
+    expect(enlaces[0].textContent).toContain('inicio');
+    expect(enlaces[0].getAttribute('aria-current')).toBe('page');
+
+    const wm = TestBed.inject(Wm);
+    wm.register('uno');
+    wm.register('dos');
+    wm.compact.set(true);
+    fixture.detectChanges();
+
+    const tabs = el.querySelectorAll<HTMLButtonElement>('[role="tab"]');
+    expect(tabs.length).toBe(2);
+    expect(tabs[0].getAttribute('aria-selected')).toBe('true');
+    expect(tabs[0].getAttribute('aria-controls')).toBe(panelId('uno'));
+
+    tabs[0].dispatchEvent(new KeyboardEvent('keydown', {
+      key: 'ArrowRight', bubbles: true, cancelable: true,
+    }));
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(wm.focused()).toBe('dos');
+    expect(tabs[1].getAttribute('aria-selected')).toBe('true');
   });
 });
 

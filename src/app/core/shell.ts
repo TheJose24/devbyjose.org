@@ -97,7 +97,7 @@ export class Shell {
           ...[...this.commands.values()].map((c) =>
             out(c.help, 'text', '  ' + (c.args ? `${c.name} ${c.args}` : c.name)),
           ),
-          out('↑ ↓ recorre el historial · Tab autocompleta', 'muted'),
+          out('↑ ↓ recorre el historial · Ctrl+Espacio autocompleta', 'muted'),
         ],
       }),
     });
@@ -153,7 +153,7 @@ export class Shell {
               out(proy.titulo, 'ok'),
               out(proy.stack, 'muted'),
               out(proy.resumen),
-              ...(proy.repo ? [out(proy.repo, 'ok', '  repo')] : []),
+              ...(proy.repos ?? []).map((repo) => out(repo.url, 'ok', `  ${repo.label.toLowerCase()}`)),
             ],
             goto: 'proyectos',
           };

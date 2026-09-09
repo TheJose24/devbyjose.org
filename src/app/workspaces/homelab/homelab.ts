@@ -29,8 +29,15 @@ import { TOPOLOGIA } from '../../data/topologia';
     .nota-uptime { margin: 6px 0 0; font-size: 12px; line-height: 1.45; }
 
     @media (max-width: 820px) {
-      :host { display: flex; flex-direction: column; }
-      .etiqueta { min-width: 10ch; }
+      :host { display: block; height: auto; }
+      .kv { grid-template-columns: minmax(0, 1fr); gap: 0; }
+      .kv dt { margin-top: 12px; }
+      .kv dt:first-child { margin-top: 0; }
+      .kv dd { margin-top: 2px; overflow-wrap: anywhere; }
+      .topo { font-size: 12px; line-height: 1.6; }
+      .nodo { column-gap: .5ch; }
+      .etiqueta { min-width: 9ch; }
+      .nota { overflow-wrap: anywhere; }
     }
   `,
 })

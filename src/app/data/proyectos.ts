@@ -5,6 +5,11 @@ export interface Dato {
   readonly acento?: boolean;
 }
 
+export interface Repositorio {
+  readonly label: 'Frontend' | 'Backend' | 'Repositorio';
+  readonly url: string;
+}
+
 export interface Proyecto {
   readonly key: string;
   /** Nombre en el listado; la extensión insinúa la naturaleza del proyecto. */
@@ -17,7 +22,7 @@ export interface Proyecto {
   readonly datos: readonly Dato[];
   /** La decisión técnica que lo hace interesante, no el listado de tecnologías. */
   readonly porQue: string;
-  readonly repo?: string;
+  readonly repos?: readonly Repositorio[];
 }
 
 export const PROYECTOS: readonly Proyecto[] = [
@@ -42,7 +47,10 @@ export const PROYECTOS: readonly Proyecto[] = [
     ],
     porQue:
       'El proyecto sirvió para practicar separación de dominios, configuración centralizada, descubrimiento y autenticación. La implementación quedó parcial y no se presenta como producto terminado ni como despliegue integral verificado.',
-    repo: 'github.com/TheJose24/HealthyMe-Backend',
+    repos: [
+      { label: 'Backend', url: 'https://github.com/TheJose24/HealthyMe-Backend' },
+      { label: 'Frontend', url: 'https://github.com/TheJose24/HealthyMe-Frontend' },
+    ],
   },
   {
     key: 'euphony',
@@ -62,7 +70,10 @@ export const PROYECTOS: readonly Proyecto[] = [
     ],
     porQue:
       'La etapa original integró autenticación centralizada con Keycloak. En 2026 retomé el proyecto para modernizar el frontend con componentes standalone, Signals y ejecución zoneless; la integración moderna completa de autenticación sigue pendiente.',
-    repo: 'github.com/TheJose24/EuphonyApp-Backend',
+    repos: [
+      { label: 'Backend', url: 'https://github.com/TheJose24/EuphonyApp-Backend' },
+      { label: 'Frontend', url: 'https://github.com/TheJose24/euphony-front' },
+    ],
   },
   {
     key: 'homelab',

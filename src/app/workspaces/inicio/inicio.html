@@ -1,33 +1,55 @@
 <dbj-pane title="neofetch">
-  <pre class="ok">{{ ascii }}</pre>
-  <hr class="rule">
-  <dl class="kv">
-    @for (spec of specs; track spec.key) {
-      <dt>{{ spec.key }}</dt>
-      <dd>
-        <span [class.ok]="spec.accent" [class.hi]="spec.key === 'rol'">{{ spec.value }}</span>
-        @if (spec.note) { <span class="dim">· {{ spec.note }}</span> }
-      </dd>
-    }
-  </dl>
-  <div class="swatch">
-    @for (color of palette; track color) { <i [style.background]="color"></i> }
-  </div>
-  <hr class="rule">
-  @for (line of bio; track $index) { <p>{{ line }}</p> }
-  <p class="dim">{{ bioTail }}</p>
+  <section aria-labelledby="perfil-title">
+    <header class="perfil-titulo">
+      <h1 id="perfil-title">José Sánchez</h1>
+      <p>Desarrollador de Software · Java &amp; Full Stack</p>
+    </header>
+    <pre class="ok" aria-hidden="true">{{ ascii }}</pre>
+    <hr class="rule">
+    <dl class="kv">
+      @for (spec of specs; track spec.key) {
+        <dt>{{ spec.key }}</dt>
+        <dd>
+          <span [class.ok]="spec.accent" [class.hi]="spec.key === 'rol'">{{ spec.value }}</span>
+          @if (spec.note) { <span class="dim">· {{ spec.note }}</span> }
+        </dd>
+      }
+    </dl>
+    <div class="swatch" aria-hidden="true">
+      @for (color of palette; track color) { <i [style.background]="color"></i> }
+    </div>
+    <hr class="rule">
+    @for (line of bio; track $index) { <p>{{ line }}</p> }
+    <p class="dim">{{ bioTail }}</p>
+
+    <nav class="acciones" aria-label="Acciones profesionales">
+      <a class="accion principal" [routerLink]="links.proyectos">Ver proyectos</a>
+      <a class="accion" [href]="links.cv" download aria-label="Descargar CV de José Sánchez en PDF">Descargar CV</a>
+      <a class="accion" [href]="links.github" target="_blank" rel="noopener noreferrer"
+         aria-label="GitHub de José Sánchez (se abre en una pestaña nueva)">GitHub</a>
+      <a class="accion" [href]="links.linkedin" target="_blank" rel="noopener noreferrer"
+         aria-label="LinkedIn de José Sánchez (se abre en una pestaña nueva)">LinkedIn</a>
+      <a class="accion" [href]="links.email">Email</a>
+    </nav>
+  </section>
 </dbj-pane>
 
 <dbj-pane title="history">
-  <div class="cmd"><b>history</b> | tail</div>
-  <dl class="hist">
-    @for (entry of history; track entry.command) {
-      <dt>{{ entry.when }}</dt>
-      <dd>{{ entry.command }}@if (entry.note) {<em>&nbsp; # {{ entry.note }}</em>}</dd>
-    }
-  </dl>
+  <section aria-labelledby="trayectoria-title">
+    <h2 id="trayectoria-title" class="sr-only">Trayectoria</h2>
+    <div class="cmd"><b>history</b> | tail</div>
+    <dl class="hist">
+      @for (entry of history; track entry.command) {
+        <dt>{{ entry.when }}</dt>
+        <dd>{{ entry.command }}@if (entry.note) {<em>&nbsp; # {{ entry.note }}</em>}</dd>
+      }
+    </dl>
+  </section>
 </dbj-pane>
 
 <dbj-pane title="zsh">
-  <dbj-zsh />
+  <section aria-labelledby="terminal-title">
+    <h2 id="terminal-title" class="sr-only">Terminal interactiva</h2>
+    <dbj-zsh />
+  </section>
 </dbj-pane>

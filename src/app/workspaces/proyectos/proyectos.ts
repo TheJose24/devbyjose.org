@@ -14,12 +14,20 @@ import { PROYECTOS, type Proyecto } from '../../data/proyectos';
       display: grid; height: 100%; gap: var(--gap);
       grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
     }
-    .por-que { color: var(--dimmer); margin-bottom: 6px; }
-    .titulo { font-size: 16px; color: var(--fg-hi); margin-bottom: 7px; }
+    .por-que { color: var(--dim); font-size: inherit; font-weight: 400; margin: 0 0 6px; }
+    .titulo { font-size: 16px; font-weight: 500; color: var(--fg-hi); margin: 0 0 7px; }
     .sub-res { color: var(--dim); }
-    .repo { color: var(--accent); }
+    .repos { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+    .repo { display: inline-flex; min-height: 38px; align-items: center; color: var(--accent); }
     .vivo { color: var(--accent); }
-    @media (max-width: 820px) { :host { display: flex; flex-direction: column; } }
+    @media (max-width: 820px) {
+      :host { display: block; height: auto; }
+      .kv { grid-template-columns: minmax(0, 1fr); gap: 0; }
+      .kv dt { margin-top: 12px; }
+      .kv dt:first-child { margin-top: 0; }
+      .kv dd { margin-top: 2px; overflow-wrap: anywhere; }
+      .repo { min-height: 44px; }
+    }
   `,
 })
 export class Proyectos {

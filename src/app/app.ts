@@ -4,15 +4,17 @@ import {
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs';
-import { Wm, WORKSPACES, routeFor, workspaceFromUrl, type WorkspaceId } from './core/wm';
+import {
+  Wm, WORKSPACES, panelId, routeFor, tabId, workspaceFromUrl, type WorkspaceId,
+} from './core/wm';
 import { Social } from './core/social';
 
 @Component({
   selector: 'dbj-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet],
+  imports: [RouterLink, RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
@@ -23,6 +25,9 @@ export class App implements OnInit {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   protected readonly workspaces = WORKSPACES;
+  protected readonly routeFor = routeFor;
+  protected readonly panelId = panelId;
+  protected readonly tabId = tabId;
   private touchX = 0;
   private touchY = 0;
 
@@ -56,6 +61,29 @@ export class App implements OnInit {
     void this.router.navigate([routeFor(id)]);
   }
 
+  protected focusTab(title: string): void {
+    this.wm.focus(title);
+  }
+
+  /** Flechas y Home/End siguen el patrón ARIA de pestañas horizontales. */
+  protected onTabKey(e: KeyboardEvent, title: string): void {
+    const tabs = this.wm.tabs();
+    const at = tabs.indexOf(title);
+    let next = at;
+
+    if (e.key === 'ArrowRight') next = (at + 1) % tabs.length;
+    else if (e.key === 'ArrowLeft') next = (at - 1 + tabs.length) % tabs.length;
+    else if (e.key === 'Home') next = 0;
+    else if (e.key === 'End') next = tabs.length - 1;
+    else return;
+
+    e.preventDefault();
+    const target = tabs[next];
+    if (!target) return;
+    this.wm.focus(target);
+    queueMicrotask(() => document.getElementById(tabId(target))?.focus());
+  }
+
   protected hostLabel(): string {
     return 'homelab bajo demanda';
   }
@@ -74,16 +102,12 @@ export class App implements OnInit {
   protected onKey(e: KeyboardEvent): void {
     const el = e.target as HTMLElement | null;
     if (el && /^(INPUT|TEXTAREA)$/.test(el.tagName)) return;
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (!e.altKey || e.metaKey || e.ctrlKey) return;
 
     if (e.key >= '1' && e.key <= '4') {
+      e.preventDefault();
       const ws = this.workspaces[Number(e.key) - 1];
       if (ws) this.goto(ws.id);
-      return;
-    }
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      this.wm.step(1);
     }
   }
 

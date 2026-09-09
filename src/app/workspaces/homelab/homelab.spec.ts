@@ -13,6 +13,8 @@ describe('Homelab', () => {
 
   it('dibuja la topología completa', async () => {
     const el = (await montar()).nativeElement as HTMLElement;
+    expect(el.querySelectorAll('h1').length).toBe(1);
+    expect(el.querySelector('h1')?.textContent).toContain('Homelab');
     expect(el.querySelectorAll('.nodo').length).toBe(TOPOLOGIA.length);
     expect(el.textContent).toContain('cloudflared');
     expect(el.textContent).toContain('proxmox-ve');

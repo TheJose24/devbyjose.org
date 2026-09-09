@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject, input } from '@angular/core';
-import { Wm } from '../core/wm';
+import { Wm, panelId, tabId } from '../core/wm';
 
 /**
  * Una ventana del mosaico. Se anuncia al gestor al montarse, de modo que el
@@ -12,6 +12,11 @@ import { Wm } from '../core/wm';
     class: 'pane',
     '[class.focus]': 'isFocused()',
     '[class.compact-on]': 'isVisible()',
+    '[attr.id]': 'panelId()',
+    '[attr.role]': "wm.compact() ? 'tabpanel' : 'region'",
+    '[attr.aria-labelledby]': 'wm.compact() ? tabId() : null',
+    '[attr.aria-label]': 'wm.compact() ? null : title()',
+    '[attr.hidden]': "isHidden() ? '' : null",
     '(mousedown)': 'wm.focus(title())',
   },
   template: `
@@ -48,7 +53,10 @@ import { Wm } from '../core/wm';
       padding: 7px 13px; border-top: 1px solid var(--line);
       font-size: 10px; color: var(--dimmer); background: #090b0c;
     }
-    @media (max-width: 820px) { .pane-body { padding: 14px 15px; } }
+    @media (max-width: 820px) {
+      :host { overflow: visible; }
+      .pane-body { overflow: visible; padding: 14px 15px; }
+    }
   `,
 })
 export class Pane implements OnDestroy {
@@ -60,6 +68,9 @@ export class Pane implements OnDestroy {
   protected readonly isFocused = computed(() => this.wm.focused() === this.title());
   /** En compacto solo se pinta la ventana enfocada. */
   protected readonly isVisible = computed(() => !this.wm.compact() || this.isFocused());
+  protected readonly isHidden = computed(() => this.wm.compact() && !this.isFocused());
+  protected readonly panelId = computed(() => panelId(this.title()));
+  protected readonly tabId = computed(() => tabId(this.title()));
 
   constructor() {
     // El registro ocurre en el constructor para respetar el orden del DOM.

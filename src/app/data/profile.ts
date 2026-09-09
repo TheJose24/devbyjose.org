@@ -34,6 +34,15 @@ export const PALETTE: readonly string[] = [
   '#c9d1cd', '#4ade80', '#e8b04a', '#58a6ff',
 ];
 
+/** Acciones públicas y canónicas; la terminal ofrece los mismos destinos. */
+export const PROFESSIONAL_LINKS = {
+  proyectos: '/proyectos',
+  cv: '/cv.pdf',
+  github: 'https://github.com/TheJose24',
+  linkedin: 'https://www.linkedin.com/in/devbyjose',
+  email: 'mailto:devbyjose@gmail.com',
+} as const;
+
 export const BIO: readonly string[] = [
   'Desarrollador de software enfocado en Java y desarrollo Full Stack.',
   'Trabajo con Spring Boot, Quarkus, Angular y Oracle/PLSQL en sistemas empresariales: mantenimiento de legacy, nuevas soluciones, despliegues y optimización de rendimiento.',

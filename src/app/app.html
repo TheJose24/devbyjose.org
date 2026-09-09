@@ -1,15 +1,16 @@
+<a class="skip-link" href="#contenido-principal">Saltar al contenido principal</a>
+
 <div class="wm">
   <header class="bar">
     <nav class="ws-list" aria-label="Espacios de trabajo">
       @for (ws of workspaces; track ws.id) {
-        <button
-          type="button"
+        <a
           class="ws-btn"
+          [routerLink]="routeFor(ws.id)"
           [class.active]="wm.workspace() === ws.id"
-          [attr.aria-current]="wm.workspace() === ws.id ? 'page' : null"
-          (click)="goto(ws.id)">
+          [attr.aria-current]="wm.workspace() === ws.id ? 'page' : null">
           <span class="glyph" aria-hidden="true">●</span>{{ ws.id }}
-        </button>
+        </a>
       }
     </nav>
 
@@ -22,26 +23,33 @@
   </header>
 
   @if (wm.compact()) {
-    <nav class="tabs" aria-label="Ventanas">
+    <nav class="tabs" role="tablist" aria-label="Ventanas">
       @for (tab of wm.tabs(); track tab) {
         <button
           type="button"
           class="tab"
+          role="tab"
+          [id]="tabId(tab)"
+          [attr.aria-controls]="panelId(tab)"
+          [attr.aria-selected]="wm.focused() === tab"
+          [attr.tabindex]="wm.focused() === tab ? 0 : -1"
           [class.on]="wm.focused() === tab"
-          (click)="wm.focus(tab)">{{ tab }}</button>
+          (click)="focusTab(tab)"
+          (keydown)="onTabKey($event, tab)">{{ tab }}</button>
       }
     </nav>
   }
 
-  <main class="stage" (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)">
+  <main id="contenido-principal" class="stage" tabindex="-1"
+        (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)">
     <router-outlet />
   </main>
 
   <footer class="hint">
     @if (wm.compact()) {
-      <span class="dimmer">desliza para cambiar de ventana</span>
+      <span class="dimmer">usa las pestañas o desliza para cambiar de ventana</span>
     } @else {
-      <span><kbd>1</kbd>–<kbd>4</kbd> espacio · <kbd>Tab</kbd> ventana</span>
+      <span><kbd>Alt</kbd>+<kbd>1</kbd>–<kbd>4</kbd> espacio</span>
       <span class="dimmer">clic en cualquier ventana para enfocarla</span>
     }
   </footer>
