@@ -4,6 +4,7 @@
    ══════════════════════════════════════════════════════════════ */
 
 @import "./fuentes.css";
+@import "./app/workspaces/inicio/inicio.css";
 
 :root {
   --bg: #08090a;

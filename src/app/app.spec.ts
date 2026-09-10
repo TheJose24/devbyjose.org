@@ -16,7 +16,7 @@ describe('App', () => {
     }).compileComponents();
   });
 
-  it('se crea, expone las acciones principales y no intercepta Tab', async () => {
+  it('presenta la home recruiter-first sin introducir regresiones en la terminal', async () => {
     const app = TestBed.createComponent(App);
     const inicio = TestBed.createComponent(Inicio);
     await Promise.all([app.whenStable(), inicio.whenStable()]);
@@ -28,14 +28,53 @@ describe('App', () => {
     expect(headings.length).toBe(1);
     expect(headings[0].textContent).toContain('José Sánchez');
     expect(el.querySelector('pre')?.getAttribute('aria-hidden')).toBe('true');
+    expect(el.querySelector('.hero-role')?.textContent).toContain(
+      'Desarrollador de Software · Java & Full Stack',
+    );
+    expect(el.querySelector('.hero-tagline')?.textContent?.trim()).toBe(
+      'Desarrollo y modernizo sistemas empresariales con Java, Spring Boot, Angular y Oracle, conectando software, rendimiento e infraestructura.',
+    );
 
     const acciones = [...el.querySelectorAll<HTMLAnchorElement>('.acciones a')];
     expect(acciones.map((a) => a.textContent?.trim())).toEqual([
-      'Ver proyectos', 'Descargar CV', 'GitHub', 'LinkedIn', 'Email',
+      'Ver proyectos', 'Descargar CV', 'LinkedIn', 'GitHub', 'Contactar',
     ]);
     expect(acciones[1].getAttribute('href')).toBe('/cv.pdf');
-    expect(acciones[2].href).toBe('https://github.com/TheJose24');
-    expect(acciones[3].href).toBe('https://www.linkedin.com/in/devbyjose');
+    expect(acciones[2].href).toBe('https://www.linkedin.com/in/devbyjose');
+    expect(acciones[3].href).toBe('https://github.com/TheJose24');
+
+    const sections = [...el.querySelectorAll<HTMLElement>('[data-home-section]')];
+    expect(sections.map((section) => section.dataset['homeSection'])).toEqual([
+      'hero', 'evidence', 'experience', 'projects', 'skills', 'homelab', 'education', 'contact',
+    ]);
+    expect(el.querySelector('.experience-entry')?.textContent).toContain('Qallpa TIC');
+    expect(el.querySelector('.experience-entry')?.textContent).toContain('Desarrollador Java Junior');
+    expect(el.querySelectorAll('.experience-entry li').length).toBe(5);
+    expect([...el.querySelectorAll('.project-card h3')].map((h) => h.textContent?.trim())).toEqual([
+      'devbyjose.org', 'Euphony', 'HealthyMe', 'Homelab',
+    ]);
+    const projectLinks = [...el.querySelectorAll<HTMLAnchorElement>('.project-link')];
+    expect(projectLinks.length).toBe(4);
+    expect(projectLinks[0].href).toBe('https://github.com/TheJose24/devbyjose.org');
+    expect(projectLinks[3].getAttribute('href')).toBe('/homelab');
+    expect([...el.querySelectorAll('.skill-group dt')].map((dt) => dt.textContent?.trim())).toEqual([
+      'Backend', 'Frontend', 'Datos', 'Entrega e infraestructura', 'Automatización e IA',
+    ]);
+    expect(el.querySelector('.homelab-teaser')?.textContent).toContain(
+      'Infraestructura personal para experimentar con despliegue, aislamiento, redes privadas y operación bajo demanda.',
+    );
+    expect(el.querySelector('.education')?.textContent).toContain('Egreso previsto: diciembre 2026');
+    expect([...el.querySelectorAll('.contact-actions a')].map((a) => a.textContent?.trim())).toEqual([
+      'Email', 'LinkedIn', 'GitHub', 'Descargar CV',
+    ]);
+    expect(el.querySelector('.evidence-item:nth-child(2)')?.textContent).not.toContain('70 %');
+    expect(el.querySelector('.experience-entry')?.textContent).toContain('70 %');
+
+    const panes = [...el.querySelectorAll<HTMLElement>('dbj-pane')];
+    expect(panes.length).toBe(3);
+    expect(panes[1].querySelector('.technical-identity')).toBeTruthy();
+    expect(panes[1].querySelector('.terminal-section dbj-zsh')).toBeTruthy();
+    expect(panes[2].textContent).toContain('history');
 
     const tab = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
     el.querySelector('input')?.dispatchEvent(tab);
@@ -60,6 +99,8 @@ describe('App', () => {
     const appEl = app.nativeElement as HTMLElement;
     expect(appEl.querySelector('.skip-link')?.getAttribute('href')).toBe('#contenido-principal');
     expect((app.nativeElement as HTMLElement).querySelector('main#contenido-principal')).toBeTruthy();
+    expect(appEl.querySelector('.bar-mod')).toBeNull();
+    expect(appEl.textContent).not.toContain('homelab bajo demanda');
   });
 
   it('resalta en la barra el espacio de la ruta actual', async () => {

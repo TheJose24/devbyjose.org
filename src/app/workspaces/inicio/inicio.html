@@ -1,42 +1,177 @@
-<dbj-pane title="neofetch">
-  <section aria-labelledby="perfil-title">
-    <header class="perfil-titulo">
-      <h1 id="perfil-title">José Sánchez</h1>
-      <p>Desarrollador de Software · Java &amp; Full Stack</p>
-    </header>
-    <pre class="ok" aria-hidden="true">{{ ascii }}</pre>
-    <hr class="rule">
-    <dl class="kv">
-      @for (spec of specs; track spec.key) {
-        <dt>{{ spec.key }}</dt>
-        <dd>
-          <span [class.ok]="spec.accent" [class.hi]="spec.key === 'rol'">{{ spec.value }}</span>
-          @if (spec.note) { <span class="dim">· {{ spec.note }}</span> }
-        </dd>
-      }
-    </dl>
-    <div class="swatch" aria-hidden="true">
-      @for (color of palette; track color) { <i [style.background]="color"></i> }
-    </div>
-    <hr class="rule">
-    @for (line of bio; track $index) { <p>{{ line }}</p> }
-    <p class="dim">{{ bioTail }}</p>
+<dbj-pane title="perfil">
+  <article class="recruiter-home">
+    <header class="hero" data-home-section="hero">
+      <p class="terminal-label" aria-hidden="true">$ whoami --professional</p>
+      <h1 id="perfil-title">{{ hero.name }}</h1>
+      <p class="hero-role">{{ hero.title }}</p>
+      <p class="hero-tagline">{{ hero.tagline }}</p>
+      <p class="hero-location">{{ hero.location }}</p>
 
-    <nav class="acciones" aria-label="Acciones profesionales">
-      <a class="accion principal" [routerLink]="links.proyectos">Ver proyectos</a>
-      <a class="accion" [href]="links.cv" download aria-label="Descargar CV de José Sánchez en PDF">Descargar CV</a>
-      <a class="accion" [href]="links.github" target="_blank" rel="noopener noreferrer"
-         aria-label="GitHub de José Sánchez (se abre en una pestaña nueva)">GitHub</a>
-      <a class="accion" [href]="links.linkedin" target="_blank" rel="noopener noreferrer"
-         aria-label="LinkedIn de José Sánchez (se abre en una pestaña nueva)">LinkedIn</a>
-      <a class="accion" [href]="links.email">Email</a>
-    </nav>
-  </section>
+      <nav class="acciones" aria-label="Acciones profesionales principales">
+        <a class="accion principal" [routerLink]="links.proyectos">Ver proyectos</a>
+        <a class="accion secundaria" [href]="links.cv" download
+           aria-label="Descargar CV de José Sánchez en PDF">Descargar CV</a>
+        <a class="accion enlace" [href]="links.linkedin" target="_blank" rel="noopener noreferrer"
+           aria-label="LinkedIn de José Sánchez (se abre en una pestaña nueva)">LinkedIn</a>
+        <a class="accion enlace" [href]="links.github" target="_blank" rel="noopener noreferrer"
+           aria-label="GitHub de José Sánchez (se abre en una pestaña nueva)">GitHub</a>
+        <a class="accion enlace" [href]="links.email">Contactar</a>
+      </nav>
+    </header>
+
+    <section class="home-section evidence" data-home-section="evidence"
+             aria-labelledby="evidence-title">
+      <div class="section-heading">
+        <p class="section-index" aria-hidden="true">01</p>
+        <h2 id="evidence-title">Evidencia profesional</h2>
+      </div>
+      <div class="evidence-grid">
+        @for (item of evidence; track item.title) {
+          <article class="evidence-item">
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.text }}</p>
+          </article>
+        }
+      </div>
+    </section>
+
+    <section class="home-section experience" data-home-section="experience"
+             aria-labelledby="experience-title">
+      <div class="section-heading">
+        <p class="section-index" aria-hidden="true">02</p>
+        <h2 id="experience-title">Experiencia profesional</h2>
+      </div>
+      <article class="experience-entry">
+        <header class="experience-header">
+          <div>
+            <h3>{{ experience.employer }}</h3>
+            <p>{{ experience.role }}</p>
+          </div>
+          <p class="experience-period">{{ experience.period }}</p>
+        </header>
+        <ul>
+          @for (bullet of experience.bullets; track bullet) { <li>{{ bullet }}</li> }
+        </ul>
+      </article>
+    </section>
+
+    <section class="home-section projects" data-home-section="projects"
+             aria-labelledby="projects-title">
+      <div class="section-heading split-heading">
+        <div>
+          <p class="section-index" aria-hidden="true">03</p>
+          <h2 id="projects-title">Proyectos destacados</h2>
+        </div>
+        <a class="section-link" [routerLink]="links.proyectos">Ver todos →</a>
+      </div>
+      <div class="project-grid">
+        @for (project of projects; track project.name) {
+          <article class="project-card">
+            <div class="project-meta">
+              <span>{{ project.type }}</span>
+              <span class="project-status">{{ project.status }}</span>
+            </div>
+            <h3>{{ project.name }}</h3>
+            <p>{{ project.value }}</p>
+            <p class="project-stack">{{ project.stack }}</p>
+            @if (project.href) {
+              <a class="project-link" [href]="project.href" target="_blank" rel="noopener noreferrer"
+                 [attr.aria-label]="'Ver ' + project.name + ' en GitHub (se abre en una pestaña nueva)'">
+                Ver proyecto →
+              </a>
+            } @else {
+              <a class="project-link" [routerLink]="project.route ?? links.proyectos">
+                Ver proyecto →
+              </a>
+            }
+          </article>
+        }
+      </div>
+    </section>
+
+    <section class="home-section skills" data-home-section="skills" aria-labelledby="skills-title">
+      <div class="section-heading">
+        <p class="section-index" aria-hidden="true">04</p>
+        <h2 id="skills-title">Skills</h2>
+      </div>
+      <dl class="skill-groups">
+        @for (group of skills; track group.title) {
+          <div class="skill-group">
+            <dt>{{ group.title }}</dt>
+            <dd>{{ group.items }}</dd>
+          </div>
+        }
+      </dl>
+    </section>
+
+    <section class="home-section homelab-teaser" data-home-section="homelab"
+             aria-labelledby="homelab-title">
+      <div class="section-heading">
+        <p class="section-index" aria-hidden="true">05</p>
+        <h2 id="homelab-title">Homelab</h2>
+      </div>
+      <p class="teaser-copy">{{ homelab.text }}</p>
+      <p class="teaser-stack">{{ homelab.stack }}</p>
+      <a class="section-link" [routerLink]="links.homelab">Ver homelab →</a>
+    </section>
+
+    <section class="home-section education" data-home-section="education"
+             aria-labelledby="education-title">
+      <div class="section-heading">
+        <p class="section-index" aria-hidden="true">06</p>
+        <h2 id="education-title">Educación</h2>
+      </div>
+      <h3>{{ education.program }}</h3>
+      <p>{{ education.institution }}</p>
+      <p class="education-status">{{ education.cycle }} · {{ education.graduation }}</p>
+    </section>
+
+    <section class="home-section contact" data-home-section="contact" aria-labelledby="contact-title">
+      <div class="section-heading">
+        <p class="section-index" aria-hidden="true">07</p>
+        <h2 id="contact-title">Contacto</h2>
+      </div>
+      <p>{{ contact }}</p>
+      <nav class="contact-actions" aria-label="Acciones de contacto">
+        <a [href]="links.email">Email</a>
+        <a [href]="links.linkedin" target="_blank" rel="noopener noreferrer"
+           aria-label="LinkedIn de José Sánchez (se abre en una pestaña nueva)">LinkedIn</a>
+        <a [href]="links.github" target="_blank" rel="noopener noreferrer"
+           aria-label="GitHub de José Sánchez (se abre en una pestaña nueva)">GitHub</a>
+        <a [href]="links.cv" download>Descargar CV</a>
+      </nav>
+      <p class="terminal-alternative">También puedes usar <code>mail</code> en la terminal.</p>
+    </section>
+  </article>
+</dbj-pane>
+
+<dbj-pane title="terminal">
+  <div class="technical-terminal">
+    <section class="technical-identity" aria-labelledby="technical-title">
+      <h2 id="technical-title" class="sr-only">Identidad técnica</h2>
+      <pre class="ok" aria-hidden="true">{{ ascii }}</pre>
+      <hr class="rule">
+      <dl class="kv">
+        @for (spec of specs; track spec.key) {
+          <dt>{{ spec.key }}</dt>
+          <dd>{{ spec.value }}</dd>
+        }
+      </dl>
+      <div class="swatch" aria-hidden="true">
+        @for (color of palette; track color) { <i [style.background]="color"></i> }
+      </div>
+    </section>
+
+    <section class="terminal-section" aria-labelledby="terminal-title">
+      <h2 id="terminal-title" class="sr-only">Terminal interactiva</h2>
+      <dbj-zsh />
+    </section>
+  </div>
 </dbj-pane>
 
 <dbj-pane title="history">
   <section aria-labelledby="trayectoria-title">
-    <h2 id="trayectoria-title" class="sr-only">Trayectoria</h2>
+    <h2 id="trayectoria-title" class="sr-only">Historial técnico</h2>
     <div class="cmd"><b>history</b> | tail</div>
     <dl class="hist">
       @for (entry of history; track entry.command) {
@@ -44,12 +179,5 @@
         <dd>{{ entry.command }}@if (entry.note) {<em>&nbsp; # {{ entry.note }}</em>}</dd>
       }
     </dl>
-  </section>
-</dbj-pane>
-
-<dbj-pane title="zsh">
-  <section aria-labelledby="terminal-title">
-    <h2 id="terminal-title" class="sr-only">Terminal interactiva</h2>
-    <dbj-zsh />
   </section>
 </dbj-pane>

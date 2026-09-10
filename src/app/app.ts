@@ -1,6 +1,6 @@
 import {
   ChangeDetectionStrategy, Component, HostListener, OnInit, PLATFORM_ID,
-  effect, inject, signal,
+  effect, inject,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -30,8 +30,6 @@ export class App implements OnInit {
   protected readonly tabId = tabId;
   private touchX = 0;
   private touchY = 0;
-
-  protected readonly ledClass = signal('stale');
 
   /** La URL manda sobre el espacio activo: así el resaltado de la barra, los
    *  enlaces directos y el botón de atrás del navegador coinciden siempre. */
@@ -82,14 +80,6 @@ export class App implements OnInit {
     if (!target) return;
     this.wm.focus(target);
     queueMicrotask(() => document.getElementById(tabId(target))?.focus());
-  }
-
-  protected hostLabel(): string {
-    return 'homelab bajo demanda';
-  }
-
-  protected hostTitle(): string {
-    return 'Infraestructura personal encendida según necesidad';
   }
 
   @HostListener('window:resize')
