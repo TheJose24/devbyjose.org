@@ -30,7 +30,7 @@ export const TOPOLOGIA: readonly Nodo[] = [
   { rama: '  │       ├── ', texto: 'proxy', tono: 'ok', nota: 'enrutamiento web · certificados' },
   { rama: '  │       └── ', texto: 'servicios', tono: 'ok', nota: 'aplicaciones y herramientas personales' },
   { rama: '  │', texto: '' },
-  { rama: '  ├── ', texto: 'lxc', tono: 'hi', nota: 'dns · tailscale · acceso remoto privado' },
+  { rama: '  ├── ', texto: 'lxc', tono: 'hi', nota: 'tailscale · acceso remoto privado' },
   { rama: '  │', texto: '' },
-  { rama: '  └── ', texto: 'vm / lxc', tono: 'dim', nota: 'plantillas y entornos de prueba bajo demanda' },
+  { rama: '  └── ', texto: 'vm / lxc', tono: 'dim', nota: 'plantillas y entornos de prueba' },
 ];

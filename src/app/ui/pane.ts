@@ -13,9 +13,9 @@ import { Wm, panelId, tabId } from '../core/wm';
     '[class.focus]': 'isFocused()',
     '[class.compact-on]': 'isVisible()',
     '[attr.id]': 'panelId()',
-    '[attr.role]': "wm.compact() ? 'tabpanel' : 'region'",
-    '[attr.aria-labelledby]': 'wm.compact() ? tabId() : null',
-    '[attr.aria-label]': 'wm.compact() ? null : title()',
+    '[attr.role]': "usesTab() ? 'tabpanel' : 'region'",
+    '[attr.aria-labelledby]': 'usesTab() ? tabId() : null',
+    '[attr.aria-label]': 'usesTab() ? null : title()',
     '[attr.hidden]': "isHidden() ? '' : null",
     '(mousedown)': 'wm.focus(title())',
   },
@@ -64,8 +64,10 @@ export class Pane implements OnDestroy {
 
   readonly title = input.required<string>();
   readonly foot = input(false);
+  readonly standalone = input(false);
 
   protected readonly isFocused = computed(() => this.wm.focused() === this.title());
+  protected readonly usesTab = computed(() => this.wm.compact() && !this.standalone());
   /** En compacto solo se pinta la ventana enfocada. */
   protected readonly isVisible = computed(() => !this.wm.compact() || this.isFocused());
   protected readonly isHidden = computed(() => this.wm.compact() && !this.isFocused());

@@ -1,65 +1,137 @@
-<dbj-pane title="homelab --topology">
-  <section aria-labelledby="homelab-title">
-    <header class="workspace-heading"><h1 id="homelab-title">Homelab</h1></header>
-    <h2 class="sr-only">Topología pública</h2>
-    <div class="cmd"><b>homelab</b> --topology</div>
-    <div class="topo">
-      @for (nodo of topologia; track $index) {
-        <div class="nodo">
-          <span class="rama">{{ nodo.rama }}</span>
-          @if (nodo.texto) {
-            <span class="etiqueta" [class]="nodo.tono ?? ''">{{ nodo.texto }}</span>
-          }
-          @if (nodo.nota) { <span class="nota">{{ nodo.nota }}</span> }
+<dbj-pane title="homelab" [standalone]="true">
+  <article class="homelab-story" aria-labelledby="homelab-title">
+    <header class="homelab-hero">
+      <p class="terminal-label">$ homelab --public-overview</p>
+      <p class="homelab-kicker">Proyecto personal · complemento al desarrollo de software</p>
+      <h1 id="homelab-title">Homelab</h1>
+      <p class="homelab-intro">
+        Entorno personal para practicar despliegue, aislamiento, redes privadas y operación de servicios bajo demanda.
+      </p>
+    </header>
+
+    <section class="homelab-section purpose-section" aria-labelledby="que-es-title">
+      <div class="section-heading">
+        <p class="section-index" aria-hidden="true">01</p>
+        <h2 id="que-es-title">Qué es</h2>
+      </div>
+      <div class="section-copy">
+        <p>
+          Es un entorno propio para desplegar aplicaciones, preparar ambientes aislados y comprender cómo se comporta el software fuera del editor.
+        </p>
+        <p>
+          Complementa mi perfil backend/full stack como práctica personal; no representa experiencia laboral de administración de sistemas.
+        </p>
+      </div>
+    </section>
+
+    <section class="homelab-section" aria-labelledby="decisiones-title">
+      <div class="section-heading">
+        <p class="section-index" aria-hidden="true">02</p>
+        <h2 id="decisiones-title">Qué decisiones practico</h2>
+      </div>
+      <div class="practice-grid">
+        <article><h3>Virtualización</h3><p>Separar sistemas completos y entornos con necesidades distintas.</p></article>
+        <article><h3>Aislamiento</h3><p>Elegir límites acordes con la carga, el riesgo y el ciclo de vida.</p></article>
+        <article><h3>Contenedores</h3><p>Empaquetar aplicaciones y mantener su ejecución reproducible.</p></article>
+        <article><h3>Acceso privado</h3><p>Administrar el entorno remoto sin publicar la red interna.</p></article>
+        <article><h3>Publicación selectiva</h3><p>Hacer públicos únicamente los servicios web elegidos.</p></article>
+      </div>
+    </section>
+
+    <section class="homelab-section topology-section" aria-labelledby="arquitectura-title">
+      <div class="topology-context">
+        <div class="section-heading">
+          <p class="section-index" aria-hidden="true">03</p>
+          <h2 id="arquitectura-title">Arquitectura general</h2>
         </div>
-      }
-    </div>
-    <hr class="rule">
-    <p class="dim">
-      Los servicios web seleccionados se publican mediante Cloudflare Tunnel, sin
-      port forwarding desde Internet. El acceso remoto privado utiliza Tailscale.
-    </p>
-  </section>
-</dbj-pane>
+        <p>
+          La topología conserva solo categorías públicas para explicar la relación entre virtualización, contenedores, acceso y publicación.
+        </p>
+        <p class="section-note">No representa estado en vivo, inventario ni capacidades del entorno.</p>
+      </div>
 
-<dbj-pane title="operación" [foot]="true">
-  <section aria-labelledby="operacion-title">
-    <h2 id="operacion-title" class="sr-only">Operación</h2>
-    <div class="cmd"><b>homelab</b> --public-summary</div>
-    <table class="ls">
-      <thead>
-        <tr><th>área</th><th>descripción</th></tr>
-      </thead>
-      <tbody>
-        @for (s of estado().services; track s.name) {
-          <tr>
-            <td class="nm">{{ s.name }}</td>
-            <td>{{ s.detail }}</td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </section>
-  <dbj-estado pane-foot />
-</dbj-pane>
+      <figure class="topology-card" aria-labelledby="topology-caption">
+        <div class="topology-command"><span aria-hidden="true">$</span> tree --public</div>
+        <div class="topology" role="img" aria-label="Topología pública generalizada del homelab">
+          @for (nodo of topologia; track $index) {
+            <div class="topology-node">
+              <span class="topology-branch" aria-hidden="true">{{ nodo.rama }}</span>
+              @if (nodo.texto) {
+                <span class="topology-label" [class]="nodo.tono ?? ''">{{ nodo.texto }}</span>
+              }
+              @if (nodo.nota) { <span class="topology-note">{{ nodo.nota }}</span> }
+            </div>
+          }
+        </div>
+        <figcaption id="topology-caption">Vista pública sanitizada de la arquitectura.</figcaption>
+      </figure>
+    </section>
 
-<dbj-pane title="criterio" [foot]="true">
-  <section aria-labelledby="criterio-title">
-    <h2 id="criterio-title" class="sr-only">Criterio operativo</h2>
-    <div class="cmd"><b>homelab</b> --operating-model</div>
-    <div class="grande">bajo demanda</div>
-    <p class="dim nota-uptime">
-      La infraestructura se enciende cuando hace falta. Esta vista describe el
-      enfoque técnico y no publica datos operativos ni promete disponibilidad.
-    </p>
-    <hr class="rule">
-    <dl class="kv">
-      <dt>hipervisor</dt><dd>Proxmox VE</dd>
-      <dt>aislamiento</dt><dd>VM · LXC · Docker</dd>
-      <dt>acceso</dt><dd>Tailscale</dd>
-      <dt>publicación</dt><dd>Cloudflare Tunnel <span class="dim">· servicios web seleccionados</span></dd>
-      <dt>red</dt><dd>sin exposición directa de puertos WAN</dd>
-    </dl>
-  </section>
-  <dbj-estado pane-foot />
+    <section class="homelab-section" aria-labelledby="plataforma-title">
+      <div class="section-heading">
+        <p class="section-index" aria-hidden="true">04</p>
+        <h2 id="plataforma-title">Decisiones de plataforma</h2>
+      </div>
+      <p class="section-lead">Cada opción responde a una necesidad distinta de aislamiento, peso y entrega.</p>
+      <div class="platform-grid">
+        <article><p class="platform-name">VM</p><h3>Sistemas completos</h3><p>Mayor aislamiento para entornos específicos que necesitan su propio sistema operativo.</p></article>
+        <article><p class="platform-name">LXC</p><h3>Servicios ligeros</h3><p>Menor sobrecarga con aislamiento a nivel de contenedor de sistema.</p></article>
+        <article><p class="platform-name">Docker</p><h3>Aplicaciones reproducibles</h3><p>Empaquetado y ejecución consistente de servicios de aplicación.</p></article>
+      </div>
+    </section>
+
+    <section class="homelab-section network-section" aria-labelledby="red-title">
+      <div class="section-heading">
+        <p class="section-index" aria-hidden="true">05</p>
+        <h2 id="red-title">Red y acceso</h2>
+      </div>
+      <div class="network-grid">
+        <article><p class="network-label">privado</p><h3>Tailscale</h3><p>Acceso remoto privado para operar y revisar el entorno.</p></article>
+        <article><p class="network-label">público selectivo</p><h3>Cloudflare Tunnel</h3><p>Publicación limitada a servicios web seleccionados, sin port forwarding desde Internet.</p></article>
+      </div>
+    </section>
+
+    <section class="homelab-section demand-section" aria-labelledby="operacion-title">
+      <div class="section-heading">
+        <p class="section-index" aria-hidden="true">06</p>
+        <h2 id="operacion-title">Operación bajo demanda</h2>
+      </div>
+      <p>
+        Los servicios se encienden cuando hacen falta. Es un laboratorio personal para experimentar y aprender, sin promesas de disponibilidad ni lectura de monitor operativo.
+      </p>
+    </section>
+
+    <section class="homelab-section skills-section" aria-labelledby="habilidades-title">
+      <div class="section-heading">
+        <p class="section-index" aria-hidden="true">07</p>
+        <h2 id="habilidades-title">Qué habilidades demuestra</h2>
+      </div>
+      <ul class="skill-list">
+        <li>Despliegue de aplicaciones</li><li>Configuración de ambientes</li>
+        <li>Aislamiento de cargas</li><li>Troubleshooting</li>
+        <li>Fundamentos de redes</li><li>Automatización</li><li>Pensamiento operativo</li>
+      </ul>
+    </section>
+
+    <section class="homelab-section stack-section" aria-labelledby="stack-title">
+      <div class="section-heading">
+        <p class="section-index" aria-hidden="true">08</p>
+        <h2 id="stack-title">Stack</h2>
+      </div>
+      <ul class="stack-list" aria-label="Tecnologías del homelab">
+        <li>Proxmox VE</li><li>VM/LXC</li><li>Docker</li>
+        <li>Linux</li><li>Tailscale</li><li>Cloudflare Tunnel</li>
+      </ul>
+    </section>
+
+    <section class="homelab-section software-section" aria-labelledby="software-title">
+      <div class="section-heading">
+        <p class="section-index" aria-hidden="true">09</p>
+        <h2 id="software-title">Relación con mi trabajo de software</h2>
+      </div>
+      <p>
+        El homelab refuerza mi trabajo en backend y full stack al darme práctica directa con despliegues, ambientes, automatización y la infraestructura que rodea una aplicación. Mi foco profesional sigue siendo el desarrollo de software.
+      </p>
+    </section>
+  </article>
 </dbj-pane>

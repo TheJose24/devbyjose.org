@@ -6,6 +6,7 @@
 @import "./fuentes.css";
 @import "./app/workspaces/inicio/inicio.css";
 @import "./app/workspaces/proyectos/proyectos.css";
+@import "./app/workspaces/homelab/homelab.css";
 
 :root {
   --bg: #08090a;

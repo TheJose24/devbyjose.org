@@ -18,7 +18,9 @@
 
   </header>
 
-  @if (wm.compact() && (wm.workspace() !== 'proyectos' || wm.tabs().length > 1)) {
+  @if (wm.compact() && (
+    (wm.workspace() !== 'proyectos' && wm.workspace() !== 'homelab') || wm.tabs().length > 1
+  )) {
     <nav class="tabs" role="tablist" aria-label="Ventanas">
       @for (tab of wm.tabs(); track tab) {
         <button
@@ -43,7 +45,11 @@
 
   <footer class="hint">
     @if (wm.compact()) {
-      <span class="dimmer">usa las pestañas o desliza para cambiar de ventana</span>
+      @if (wm.workspace() === 'homelab' && wm.tabs().length <= 1) {
+        <span class="dimmer">desplázate para recorrer el contenido</span>
+      } @else {
+        <span class="dimmer">usa las pestañas o desliza para cambiar de ventana</span>
+      }
     } @else {
       <span><kbd>Alt</kbd>+<kbd>1</kbd>–<kbd>4</kbd> espacio</span>
       <span class="dimmer">clic en cualquier ventana para enfocarla</span>

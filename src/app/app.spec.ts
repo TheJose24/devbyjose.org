@@ -151,7 +151,7 @@ describe('App', () => {
     expect(tabs[1].getAttribute('aria-selected')).toBe('true');
   });
 
-  it('oculta la pestaña compacta única de proyectos sin afectar otros espacios', async () => {
+  it('oculta la pestaña compacta única de proyectos y homelab sin afectar otros espacios', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const wm = TestBed.inject(Wm);
@@ -164,6 +164,11 @@ describe('App', () => {
     expect(el.querySelector('.tabs')).toBeNull();
 
     wm.goto('homelab');
+    fixture.detectChanges();
+    expect(el.querySelector('.tabs')).toBeNull();
+    expect(el.querySelector('.hint')?.textContent).toContain('desplázate para recorrer el contenido');
+
+    wm.goto('inicio');
     fixture.detectChanges();
     expect(el.querySelectorAll('[role="tab"]').length).toBe(1);
 
