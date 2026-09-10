@@ -1,63 +1,123 @@
-<dbj-pane title="ls -la ~/proyectos">
-  <section aria-labelledby="proyectos-title">
-    <header class="workspace-heading">
-      <h1 id="proyectos-title">Proyectos</h1>
-    </header>
-    <div class="cmd"><b>ls</b> -la ~/proyectos</div>
-    <div class="lista">
-      <div class="lista-cab"><span>nombre</span><span>modif</span></div>
-      @for (p of proyectos; track p.key) {
-        <button
-          type="button"
-          class="fila"
-          aria-controls="project-detail"
-          [attr.aria-pressed]="seleccionado() === p.key"
-          [class.sel]="seleccionado() === p.key"
-          (click)="seleccionar(p.key)">
-          <span>
-            <span class="nm">{{ p.archivo }}</span>
-            <span class="sub">{{ p.stack }}</span>
-          </span>
-          <span [class]="p.enVivo ? 'ok' : 'der'">{{ p.modificado }}</span>
-        </button>
-      }
-    </div>
-    <hr class="rule">
-    <p class="dimmer">{{ proyectos.length }} entradas · clic para abrir</p>
-  </section>
-</dbj-pane>
+<dbj-pane title="proyectos">
+  <div class="project-workspace">
+    <aside class="project-browser" aria-labelledby="proyectos-title">
+      <header class="project-intro">
+        <p class="terminal-label">$ ls -la ~/proyectos</p>
+        <h1 id="proyectos-title">Casos de estudio</h1>
+        <p>Proyectos seleccionados con contexto, decisiones técnicas, resultados verificables y límites explícitos.</p>
+      </header>
 
-<dbj-pane title="cat README">
-  <article id="project-detail" [attr.aria-labelledby]="'project-' + actual().key">
-    <div class="cmd"><b>cat</b> {{ actual().key }}/README.md</div>
-    <h2 class="titulo" [id]="'project-' + actual().key">{{ actual().titulo }}</h2>
-    <p class="sub-res">{{ actual().resumen }}</p>
+      <section aria-labelledby="selector-title">
+        <h2 id="selector-title" class="selector-title">Selecciona un proyecto</h2>
+        <div class="project-list">
+          @for (p of proyectos; track p.key) {
+            <button
+              type="button"
+              class="project-option"
+              aria-controls="project-detail"
+              [attr.aria-pressed]="seleccionado() === p.key"
+              [class.selected]="seleccionado() === p.key"
+              (click)="seleccionar(p.key)">
+              <span class="option-topline">
+                <strong>{{ p.titulo }}</strong>
+                <span class="project-status">{{ p.estado }}</span>
+              </span>
+              <span class="project-type">{{ p.tipo }}</span>
+              <span class="project-period">{{ p.periodo }}</span>
+            </button>
+          }
+        </div>
+      </section>
 
-    <hr class="rule">
-    <dl class="kv">
-      @for (d of actual().datos; track d.clave) {
-        <dt>{{ d.clave }}</dt>
-        <dd>
-          <span [class.ok]="d.acento">{{ d.valor }}</span>
-          @if (d.nota) { <span class="dim">· {{ d.nota }}</span> }
-        </dd>
-      }
-    </dl>
+      <p class="browser-count">{{ proyectos.length }} casos · selección activa: {{ actual().titulo }}</p>
+    </aside>
 
-    <hr class="rule">
-    <h3 class="por-que">por qué así</h3>
-    <p>{{ actual().porQue }}</p>
+    <article
+      id="project-detail"
+      class="case-study"
+      [attr.aria-labelledby]="'project-' + actual().key">
+      <header class="case-hero">
+        <p class="terminal-label">$ cat {{ actual().key }}/case-study.md</p>
+        <div class="case-heading">
+          <div>
+            <p class="case-kicker">{{ actual().tipo }}</p>
+            <h2 [id]="'project-' + actual().key">{{ actual().titulo }}</h2>
+          </div>
+          <span class="status-badge">{{ actual().estado }}</span>
+        </div>
+        <p class="case-summary">{{ actual().resumen }}</p>
+      </header>
 
-    @if (actual().repos; as repos) {
-      <hr class="rule">
-      <nav class="repos" [attr.aria-label]="'Repositorios de ' + actual().titulo">
-        @for (repo of repos; track repo.url) {
-          <a class="repo" [href]="repo.url" target="_blank" rel="noopener noreferrer"
-             [attr.aria-label]="repo.label + ' de ' + actual().titulo + ' en GitHub (se abre en una pestaña nueva)'">
-            → {{ repo.label }} en GitHub
-          </a>
-        }
-      </nav>
-    }
-  </article>
+      <section class="case-section case-context" aria-labelledby="context-title">
+        <h3 id="context-title">Contexto</h3>
+        <dl>
+          <div><dt>Tipo</dt><dd>{{ actual().tipo }}</dd></div>
+          <div><dt>Periodo</dt><dd>{{ actual().periodo }}</dd></div>
+          <div><dt>Estado</dt><dd>{{ actual().estado }}</dd></div>
+        </dl>
+      </section>
+
+      <div class="case-columns">
+        <section class="case-section" aria-labelledby="problem-title">
+          <h3 id="problem-title">Problema</h3>
+          <p>{{ actual().problema }}</p>
+        </section>
+
+        <section class="case-section" aria-labelledby="contribution-title">
+          <h3 id="contribution-title">Mi contribución</h3>
+          <p>{{ actual().contribucion }}</p>
+        </section>
+      </div>
+
+      <section class="case-section" aria-labelledby="decisions-title">
+        <h3 id="decisions-title">Decisiones técnicas</h3>
+        <ul class="case-list">
+          @for (decision of actual().decisiones; track $index) { <li>{{ decision }}</li> }
+        </ul>
+      </section>
+
+      <section class="case-section" aria-labelledby="implementation-title">
+        <h3 id="implementation-title">Implementación</h3>
+        <ul class="case-list">
+          @for (item of actual().implementacion; track $index) { <li>{{ item }}</li> }
+        </ul>
+      </section>
+
+      <section class="case-section result-section" aria-labelledby="result-title">
+        <h3 id="result-title">Resultado</h3>
+        <ul class="case-list">
+          @for (item of actual().resultado; track $index) { <li>{{ item }}</li> }
+        </ul>
+      </section>
+
+      <section class="case-section limits-section" aria-labelledby="limits-title">
+        <h3 id="limits-title">Estado y límites</h3>
+        <ul class="case-list">
+          @for (item of actual().limites; track $index) { <li>{{ item }}</li> }
+        </ul>
+      </section>
+
+      <section class="case-section" aria-labelledby="stack-title">
+        <h3 id="stack-title">Stack</h3>
+        <ul class="stack-list" aria-label="Tecnologías principales">
+          @for (technology of actual().stack; track $index) { <li>{{ technology }}</li> }
+        </ul>
+      </section>
+
+      <section class="case-section evidence-section" aria-labelledby="evidence-title">
+        <h3 id="evidence-title">Evidencia</h3>
+        <nav class="project-links" [attr.aria-label]="'Evidencia de ' + actual().titulo">
+          @for (link of actual().evidencia; track link.url) {
+            <a
+              [href]="link.url"
+              [attr.target]="link.external ? '_blank' : null"
+              [attr.rel]="link.external ? 'noopener noreferrer' : null"
+              [attr.aria-label]="link.external ? link.label + ' de ' + actual().titulo + ' (se abre en una pestaña nueva)' : link.label + ' de ' + actual().titulo">
+              {{ link.label }} <span aria-hidden="true">→</span>
+            </a>
+          }
+        </nav>
+      </section>
+    </article>
+  </div>
 </dbj-pane>

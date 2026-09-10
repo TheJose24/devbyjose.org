@@ -18,7 +18,7 @@
 
   </header>
 
-  @if (wm.compact()) {
+  @if (wm.compact() && (wm.workspace() !== 'proyectos' || wm.tabs().length > 1)) {
     <nav class="tabs" role="tablist" aria-label="Ventanas">
       @for (tab of wm.tabs(); track tab) {
         <button

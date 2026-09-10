@@ -5,6 +5,7 @@
 
 @import "./fuentes.css";
 @import "./app/workspaces/inicio/inicio.css";
+@import "./app/workspaces/proyectos/proyectos.css";
 
 :root {
   --bg: #08090a;

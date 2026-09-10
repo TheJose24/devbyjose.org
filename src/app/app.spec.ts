@@ -150,6 +150,28 @@ describe('App', () => {
     expect(wm.focused()).toBe('dos');
     expect(tabs[1].getAttribute('aria-selected')).toBe('true');
   });
+
+  it('oculta la pestaña compacta única de proyectos sin afectar otros espacios', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const wm = TestBed.inject(Wm);
+    const el = fixture.nativeElement as HTMLElement;
+
+    wm.compact.set(true);
+    wm.goto('proyectos');
+    wm.register('proyectos');
+    fixture.detectChanges();
+    expect(el.querySelector('.tabs')).toBeNull();
+
+    wm.goto('homelab');
+    fixture.detectChanges();
+    expect(el.querySelectorAll('[role="tab"]').length).toBe(1);
+
+    wm.goto('proyectos');
+    wm.register('detalle');
+    fixture.detectChanges();
+    expect(el.querySelectorAll('[role="tab"]').length).toBe(2);
+  });
 });
 
 describe('Wm', () => {
