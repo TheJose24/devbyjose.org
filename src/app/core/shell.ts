@@ -97,7 +97,7 @@ export class Shell {
           ...[...this.commands.values()].map((c) =>
             out(c.help, 'text', '  ' + (c.args ? `${c.name} ${c.args}` : c.name)),
           ),
-          out('↑ ↓ recorre el historial · Tab autocompleta', 'muted'),
+          out('↑ ↓ recorre el historial · Ctrl+Espacio autocompleta', 'muted'),
         ],
       }),
     });
@@ -122,7 +122,7 @@ export class Shell {
             out(`${n.resumen.slice(0, 54)}…`, 'text', `${n.slug}.md`)));
         }
         if (que.startsWith('proyecto')) {
-          return only(...PROYECTOS.map((p) => out(p.stack, 'text', p.archivo)));
+          return only(...PROYECTOS.map((p) => out(p.stack.join(' · ').toLowerCase(), 'text', p.archivo)));
         }
         return only(out(`no existe el directorio: ${que}`, 'warn'));
       },
@@ -151,9 +151,9 @@ export class Shell {
           return {
             lines: [
               out(proy.titulo, 'ok'),
-              out(proy.stack, 'muted'),
+              out(proy.stack.join(' · '), 'muted'),
               out(proy.resumen),
-              ...(proy.repo ? [out(proy.repo, 'ok', '  repo')] : []),
+              ...proy.evidencia.map((link) => out(link.url, 'ok', `  ${link.label.toLowerCase()}`)),
             ],
             goto: 'proyectos',
           };

@@ -7,6 +7,24 @@ export interface WorkspaceMeta {
   readonly path: string;
 }
 
+/** Identificadores estables para relacionar las pestañas compactas y sus paneles. */
+function idDeVentana(title: string): string {
+  return title
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+export function tabId(title: string): string {
+  return `tab-${idDeVentana(title)}`;
+}
+
+export function panelId(title: string): string {
+  return `panel-${idDeVentana(title)}`;
+}
+
 /**
  * Las notas siguen en borrador y el sitio ya está publicado, así que el espacio
  * se oculta entero: sin pestaña, sin ruta y sin comandos. Publicar una sección

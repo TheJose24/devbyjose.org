@@ -1,5 +1,6 @@
+import { DOCUMENT } from '@angular/common';
 import { Injectable, inject } from '@angular/core';
-import { Meta } from '@angular/platform-browser';
+import { Meta, Title } from '@angular/platform-browser';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { NOTAS_PUBLICADAS } from './wm';
@@ -20,19 +21,19 @@ export interface Tarjeta {
  */
 export const TARJETAS: Readonly<Record<string, Tarjeta>> = {
   '/': {
-    titulo: 'José Sánchez · Software Engineer · Java & Full Stack',
+    titulo: 'José Sánchez | Java & Full Stack',
     descripcion:
-      'Desarrollo y modernizo sistemas empresariales con Java, Spring Boot, Angular y Oracle, conectando software, rendimiento e infraestructura.',
+      'José Sánchez, desarrollador de software enfocado en Java y Full Stack, con experiencia en sistemas empresariales, modernización y rendimiento.',
   },
   '/proyectos': {
-    titulo: 'Proyectos · José Sánchez',
+    titulo: 'Proyectos | José Sánchez',
     descripcion:
-      'HealthyMe, Euphony y mi homelab: alcance, tecnologías y decisiones técnicas de cada proyecto.',
+      'Casos de estudio de José Sánchez con contexto, decisiones técnicas, resultados verificables y límites explícitos.',
   },
   '/homelab': {
-    titulo: 'Homelab — infraestructura autoalojada',
+    titulo: 'Homelab | José Sánchez',
     descripcion:
-      'Proxmox VE, VM/LXC y Docker, con acceso mediante Tailscale y servicios web publicados con Cloudflare Tunnel sin port forwarding desde Internet.',
+      'Homelab personal de José Sánchez para practicar despliegue, aislamiento, contenedores y operación de software bajo demanda.',
   },
   ...(NOTAS_PUBLICADAS
     ? {
@@ -57,6 +58,8 @@ export function claveDeRuta(url: string): string {
 @Injectable({ providedIn: 'root' })
 export class Social {
   private readonly meta = inject(Meta);
+  private readonly title = inject(Title);
+  private readonly document = inject(DOCUMENT);
   private readonly router = inject(Router);
 
   /** Se llama una vez desde el componente raíz. */
@@ -70,13 +73,24 @@ export class Social {
   aplicar(url: string): void {
     const clave = claveDeRuta(url);
     const t = TARJETAS[clave] ?? POR_DEFECTO;
+    const urlCanonica = SITIO + (clave === '/' ? '/' : clave);
     const imagen = SITIO + (t.imagen ?? '/og.png');
 
+    this.title.setTitle(t.titulo);
     this.meta.updateTag({ name: 'description', content: t.descripcion });
+    this.meta.updateTag({ name: 'robots', content: 'index, follow' });
     this.meta.updateTag({ property: 'og:title', content: t.titulo });
     this.meta.updateTag({ property: 'og:description', content: t.descripcion });
-    this.meta.updateTag({ property: 'og:url', content: SITIO + (clave === '/' ? '/' : clave) });
+    this.meta.updateTag({ property: 'og:url', content: urlCanonica });
     this.meta.updateTag({ property: 'og:image', content: imagen });
     this.meta.updateTag({ property: 'og:image:alt', content: t.titulo });
+    this.meta.updateTag({ name: 'twitter:title', content: t.titulo });
+    this.meta.updateTag({ name: 'twitter:description', content: t.descripcion });
+    this.meta.updateTag({ name: 'twitter:image', content: imagen });
+    this.meta.updateTag({ name: 'twitter:image:alt', content: t.titulo });
+
+    this.document
+      .querySelector<HTMLLinkElement>('link[rel="canonical"]')
+      ?.setAttribute('href', urlCanonica);
   }
 }

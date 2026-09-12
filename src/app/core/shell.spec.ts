@@ -16,6 +16,7 @@ describe('Shell', () => {
     for (const nombre of sh.names) {
       expect(r.lines.some((l) => l.label?.trim().startsWith(nombre))).toBe(true);
     }
+    expect(r.lines.some((l) => l.text?.includes('Ctrl+Espacio'))).toBe(true);
   });
 
   it('un comando inexistente sugiere el más parecido', () => {

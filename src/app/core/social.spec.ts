@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { Meta } from '@angular/platform-browser';
+import { Meta, Title } from '@angular/platform-browser';
 import { Social, TARJETAS, claveDeRuta } from './social';
 import { WORKSPACES, routeFor } from './wm';
 
@@ -55,7 +55,11 @@ describe('TARJETAS', () => {
 describe('Social', () => {
   function montar() {
     TestBed.configureTestingModule({ providers: [provideRouter([])] });
-    return { social: TestBed.inject(Social), meta: TestBed.inject(Meta) };
+    return {
+      social: TestBed.inject(Social),
+      meta: TestBed.inject(Meta),
+      title: TestBed.inject(Title),
+    };
   }
 
   it('escribe la tarjeta del homelab, no la del inicio', () => {
@@ -68,9 +72,7 @@ describe('Social', () => {
   it('usa la imagen general cuando la ruta no define una propia', () => {
     const { social, meta } = montar();
     social.aplicar('/homelab');
-    expect(meta.getTag('property="og:image"')?.content).toBe(
-      'https://www.devbyjose.org/og.png',
-    );
+    expect(meta.getTag('property="og:image"')?.content).toBe('https://www.devbyjose.org/og.png');
   });
 
   it('cae a la imagen general cuando la ruta no tiene una propia', () => {
@@ -89,5 +91,23 @@ describe('Social', () => {
     const { social, meta } = montar();
     social.aplicar('/notas/vm-vs-lxc');
     expect(meta.getTag('property="og:url"')?.content).toBe('https://www.devbyjose.org/notas');
+  });
+
+  it('sincroniza title, canonical y metadatos de Twitter por ruta', () => {
+    const canonical = document.createElement('link');
+    canonical.rel = 'canonical';
+    document.head.append(canonical);
+    const { social, meta, title } = montar();
+
+    social.aplicar('/proyectos');
+
+    expect(title.getTitle()).toBe(TARJETAS['/proyectos'].titulo);
+    expect(canonical.href).toBe('https://www.devbyjose.org/proyectos');
+    expect(meta.getTag('name="twitter:title"')?.content).toBe(TARJETAS['/proyectos'].titulo);
+    expect(meta.getTag('name="twitter:description"')?.content).toBe(
+      TARJETAS['/proyectos'].descripcion,
+    );
+    expect(meta.getTag('name="twitter:image"')?.content).toBe('https://www.devbyjose.org/og.png');
+    canonical.remove();
   });
 });

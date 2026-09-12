@@ -12,7 +12,7 @@ function descifrar(linea: string): string {
 }
 
 /** Solo las cabeceras: el cuerpo empieza tras la primera línea en blanco. */
-const cabeceras = (crudo: string) => crudo.split(/\r?\n\r?\n/)[0];
+const cabeceras = (crudo: string) => crudo.split(/\r?\n\r?\n/)[0]!;
 const cabecera = (crudo: string, nombre: string) =>
   descifrar(cabeceras(crudo).split(/\r?\n/).find((l) => l.startsWith(`${nombre}: `)) ?? '');
 

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject, input } from '@angular/core';
-import { Wm } from '../core/wm';
+import { Wm, panelId, tabId } from '../core/wm';
 
 /**
  * Una ventana del mosaico. Se anuncia al gestor al montarse, de modo que el
@@ -12,6 +12,11 @@ import { Wm } from '../core/wm';
     class: 'pane',
     '[class.focus]': 'isFocused()',
     '[class.compact-on]': 'isVisible()',
+    '[attr.id]': 'panelId()',
+    '[attr.role]': "usesTab() ? 'tabpanel' : 'region'",
+    '[attr.aria-labelledby]': 'usesTab() ? tabId() : null',
+    '[attr.aria-label]': 'usesTab() ? null : title()',
+    '[attr.hidden]': "isHidden() ? '' : null",
     '(mousedown)': 'wm.focus(title())',
   },
   template: `
@@ -29,26 +34,48 @@ import { Wm } from '../core/wm';
       display: flex; flex-direction: column; min-height: 0;
       background: var(--pane); border: 1px solid var(--line);
       border-radius: var(--radius); overflow: hidden;
-      transition: border-color 0.15s;
+      transition: border-color var(--motion-fast) var(--motion-ease),
+        background-color var(--motion-fast) var(--motion-ease),
+        box-shadow var(--motion-fast) var(--motion-ease);
     }
-    :host(.focus) { border-color: var(--accent-line); background: var(--pane-hi); }
+    :host(.focus) {
+      border-color: var(--accent-line); background: var(--pane-hi);
+      box-shadow: inset 0 1px rgba(74, 222, 128, 0.05);
+    }
     .pane-bar {
-      display: flex; align-items: center; gap: 9px; padding: 7px 11px; flex: 0 0 auto;
-      border-bottom: 1px solid var(--line); font-size: 10.5px;
+      display: flex; align-items: center; gap: var(--space-2); min-height: 32px;
+      padding: 7px var(--space-3); flex: 0 0 auto;
+      border-bottom: 1px solid var(--line); background: rgba(8, 9, 10, 0.28); font-size: 10.5px;
       color: var(--dim); letter-spacing: 0.06em;
+      transition: color var(--motion-fast) var(--motion-ease),
+        border-color var(--motion-fast) var(--motion-ease);
     }
-    :host(.focus) .pane-bar { color: var(--fg); }
+    :host(.focus) .pane-bar { color: var(--fg); border-bottom-color: var(--line-hi); }
     .pane-dots { display: flex; gap: 4px; flex: 0 0 auto; }
-    .pane-dots i { width: 7px; height: 7px; border-radius: 50%; background: #232b2d; display: block; }
-    :host(.focus) .pane-dots i:first-child { background: var(--accent); }
+    .pane-dots i {
+      width: 7px; height: 7px; border-radius: 50%; background: #293234; display: block;
+      transition: background-color var(--motion-fast) var(--motion-ease),
+        opacity var(--motion-fast) var(--motion-ease);
+    }
+    .pane-dots i:nth-child(2) { opacity: 0.75; }
+    .pane-dots i:nth-child(3) { opacity: 0.5; }
+    :host(.focus) .pane-dots i:first-child { background: var(--accent); opacity: 1; }
     .pane-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .pane-body { flex: 1; min-height: 0; overflow: auto; padding: 13px 15px; }
+    .pane-body {
+      flex: 1; min-height: 0; overflow: auto;
+      padding: var(--pane-pad-y) var(--pane-pad-x);
+      overscroll-behavior: contain;
+    }
     .pane-foot {
       flex: 0 0 auto; display: flex; align-items: center; gap: 8px;
       padding: 7px 13px; border-top: 1px solid var(--line);
       font-size: 10px; color: var(--dimmer); background: #090b0c;
     }
-    @media (max-width: 820px) { .pane-body { padding: 14px 15px; } }
+    @media (max-width: 820px) {
+      :host { overflow: visible; }
+      .pane-bar { min-height: 34px; padding-inline: var(--space-3); }
+      .pane-body { overflow: visible; padding: var(--pane-pad-y) var(--pane-pad-x); }
+    }
   `,
 })
 export class Pane implements OnDestroy {
@@ -56,10 +83,15 @@ export class Pane implements OnDestroy {
 
   readonly title = input.required<string>();
   readonly foot = input(false);
+  readonly standalone = input(false);
 
   protected readonly isFocused = computed(() => this.wm.focused() === this.title());
+  protected readonly usesTab = computed(() => this.wm.compact() && !this.standalone());
   /** En compacto solo se pinta la ventana enfocada. */
   protected readonly isVisible = computed(() => !this.wm.compact() || this.isFocused());
+  protected readonly isHidden = computed(() => this.wm.compact() && !this.isFocused());
+  protected readonly panelId = computed(() => panelId(this.title()));
+  protected readonly tabId = computed(() => tabId(this.title()));
 
   constructor() {
     // El registro ocurre en el constructor para respetar el orden del DOM.
