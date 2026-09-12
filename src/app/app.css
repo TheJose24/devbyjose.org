@@ -15,10 +15,18 @@
 .ws-btn {
   display: flex; align-items: center; justify-content: center; min-height: 28px; padding: 0 8px;
   border: 1px solid transparent; border-radius: 4px; color: var(--dimmer);
-  background: none; font: inherit; cursor: pointer; transition: 0.14s;
+  background: none; font: inherit; cursor: pointer; text-decoration: none;
+  transition: color var(--motion-fast) var(--motion-ease),
+    background-color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease),
+    box-shadow var(--motion-fast) var(--motion-ease);
 }
-.ws-btn:hover { color: var(--fg); background: #121617; }
-.ws-btn.active { color: var(--accent); border-color: var(--accent-line); background: var(--accent-soft); }
+.ws-btn:hover { color: var(--fg-hi); border-color: var(--line-hi); background: #121617; }
+.ws-btn.active {
+  color: var(--accent); border-color: var(--accent-line); background: var(--accent-soft);
+  box-shadow: inset 0 -2px var(--accent);
+}
+.ws-btn:active { background: rgba(74, 222, 128, 0.14); }
 .glyph { font-size: 8px; margin-right: 6px; opacity: 0.85; }
 
 .bar-title { flex: 1; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -39,8 +47,17 @@
   flex: 0 0 auto; min-height: 36px; padding: 0 12px; border: 1px solid var(--line);
   border-radius: 5px; background: var(--pane); color: var(--dim);
   font: inherit; font-size: 11px; cursor: pointer; white-space: nowrap;
+  transition: color var(--motion-fast) var(--motion-ease),
+    background-color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease),
+    box-shadow var(--motion-fast) var(--motion-ease);
 }
-.tab.on { color: var(--accent); border-color: var(--accent-line); background: var(--accent-soft); }
+.tab:hover { color: var(--fg-hi); border-color: var(--line-hi); background: #121617; }
+.tab.on {
+  color: var(--accent); border-color: var(--accent-line); background: var(--accent-soft);
+  box-shadow: inset 0 -2px var(--accent);
+}
+.tab:active { background: rgba(74, 222, 128, 0.14); }
 
 .stage { flex: 1; min-height: 0; }
 
@@ -63,5 +80,10 @@ kbd {
   .ws-btn { min-height: 44px; padding: 0 12px; }
   .tab { min-height: 44px; }
   .stage { flex: 0 0 auto; min-width: 0; min-height: 0; }
-  .hint { justify-content: center; }
+  .hint { display: none; }
+}
+
+@media (min-width: 821px) and (max-width: 1440px) {
+  .hint span:last-child { display: none; }
+  .hint { justify-content: flex-start; }
 }

@@ -2,59 +2,66 @@
 .ws-proyectos > dbj-pane { height: 100%; }
 
 .ws-proyectos .project-workspace {
-  display: grid; grid-template-columns: minmax(300px, 0.72fr) minmax(0, 1.8fr);
-  gap: 0; min-height: 100%;
+  display: grid; grid-template-columns: clamp(300px, 25vw, 360px) minmax(0, 1fr);
+  gap: 0; width: min(100%, 1540px); min-height: 100%; margin: 0 auto;
 }
 
 .ws-proyectos .project-browser {
-  position: sticky; top: 0; align-self: start; padding: 11px 22px 20px 4px;
+  position: sticky; top: 0; align-self: start; padding: var(--space-3) var(--space-5) var(--space-5) var(--space-1);
   border-right: 1px solid var(--line);
 }
-.ws-proyectos .project-intro { padding-bottom: 22px; border-bottom: 1px solid var(--line); }
+.ws-proyectos .project-intro { padding-bottom: var(--space-5); border-bottom: 1px solid var(--line); }
 .ws-proyectos .terminal-label {
   margin: 0 0 11px; color: var(--dimmer); font-size: 12px; letter-spacing: 0.04em;
 }
 .ws-proyectos .project-intro h1 {
-  margin: 0; color: var(--fg-hi); font-size: clamp(27px, 2.5vw, 38px);
+  margin: 0; color: var(--fg-hi); font-size: clamp(27px, 2.4vw, 36px);
   line-height: 1.12; letter-spacing: -0.035em;
 }
 .ws-proyectos .project-intro > p:last-child { margin: 13px 0 0; color: var(--dim); }
 .ws-proyectos .selector-title {
-  margin: 22px 0 11px; color: var(--fg-hi); font-size: 14px; font-weight: 550;
+  margin: var(--space-5) 0 var(--space-3); color: var(--fg-hi); font-size: 14px; font-weight: 550;
 }
-.ws-proyectos .project-list { display: grid; gap: 7px; }
+.ws-proyectos .project-list { display: grid; gap: var(--space-2); }
 .ws-proyectos .project-option {
-  width: 100%; min-height: 92px; padding: 13px 14px; border: 1px solid var(--line);
+  width: 100%; min-height: 92px; padding: var(--space-3) var(--space-4); border: 1px solid var(--line);
   border-left: 2px solid transparent; border-radius: var(--radius-sm); text-align: left;
   background: #090b0c; color: var(--fg); font: inherit; cursor: pointer;
+  transition: color var(--motion-fast) var(--motion-ease),
+    background-color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease),
+    box-shadow var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
 }
-.ws-proyectos .project-option:hover { border-color: var(--line-hi); background: #0e1213; }
+.ws-proyectos .project-option:hover { border-color: var(--line-hi); background: #0e1213; transform: translateX(1px); }
+.ws-proyectos .project-option:active { transform: translateX(1px) scale(0.995); }
 .ws-proyectos .project-option.selected {
   border-color: var(--accent-line); border-left-color: var(--accent); background: var(--accent-soft);
+  box-shadow: inset 3px 0 rgba(74, 222, 128, 0.12);
 }
 .ws-proyectos .option-topline { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
-.ws-proyectos .option-topline strong { color: var(--fg-hi); font-size: 14px; font-weight: 550; }
-.ws-proyectos .project-status { color: var(--accent); font-size: 12px; text-align: right; }
+.ws-proyectos .option-topline strong { color: var(--fg-hi); font-size: 14px; font-weight: 550; overflow-wrap: anywhere; }
+.ws-proyectos :is(.project-status, .status-badge) {
+  flex: 0 0 auto; padding: 4px 8px; border: 1px solid var(--accent-line);
+  border-radius: 999px; color: var(--accent); background: var(--accent-soft);
+  font-size: 12px; line-height: 1.35; text-align: right;
+}
 .ws-proyectos :is(.project-type, .project-period) { display: block; margin-top: 7px; color: var(--dim); font-size: 12px; }
 .ws-proyectos .project-period { margin-top: 3px; color: var(--dimmer); }
 .ws-proyectos .browser-count { margin: 15px 0 0; color: var(--dimmer); font-size: 12px; }
 
-.ws-proyectos .case-study { max-width: 1180px; padding: 11px 24px 42px 30px; }
-.ws-proyectos .case-hero { padding-bottom: 27px; }
+.ws-proyectos .case-study { max-width: 1040px; padding: var(--space-3) var(--space-5) var(--space-7) var(--space-6); }
+.ws-proyectos .case-hero { padding-bottom: var(--space-6); }
 .ws-proyectos .case-heading { display: flex; align-items: start; justify-content: space-between; gap: 24px; }
 .ws-proyectos .case-kicker { margin: 0 0 6px; color: var(--accent); font-size: 12px; }
 .ws-proyectos .case-heading h2 {
-  margin: 0; color: var(--fg-hi); font-size: clamp(27px, 2.4vw, 38px);
+  margin: 0; color: var(--fg-hi); font-size: clamp(27px, 2.35vw, 36px);
   line-height: 1.12; letter-spacing: -0.035em;
 }
-.ws-proyectos .status-badge {
-  flex: 0 0 auto; padding: 6px 9px; border: 1px solid var(--accent-line);
-  border-radius: 999px; color: var(--accent); background: var(--accent-soft); font-size: 12px;
-}
 .ws-proyectos .case-summary {
-  max-width: 780px; margin: 18px 0 0; color: var(--fg-hi); font-size: 17px; line-height: 1.55;
+  max-width: var(--content-reading); margin: var(--space-4) 0 0; color: var(--fg-hi); font-size: 17px; line-height: 1.55;
 }
-.ws-proyectos .case-section { padding: 24px 0; border-top: 1px solid var(--line); }
+.ws-proyectos .case-section { padding: var(--space-5) 0; border-top: 1px solid var(--line); }
 .ws-proyectos .case-section h3 {
   margin: 0 0 13px; color: var(--fg-hi); font-size: 16px; line-height: 1.35; font-weight: 550;
 }
@@ -62,8 +69,11 @@
 .ws-proyectos .case-section p { margin: 0; }
 .ws-proyectos .case-context dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; margin: 0; }
 .ws-proyectos .case-context dl > div {
-  padding: 12px 13px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: #090b0c;
+  padding: var(--space-3); border: 1px solid var(--line); border-radius: var(--radius-sm); background: #090b0c;
+  transition: border-color var(--motion-fast) var(--motion-ease),
+    background-color var(--motion-fast) var(--motion-ease);
 }
+.ws-proyectos .case-context dl > div:hover { border-color: var(--line-hi); background: #0d1011; }
 .ws-proyectos .case-context dt { color: var(--dimmer); font-size: 12px; }
 .ws-proyectos .case-context dd { margin: 5px 0 0; color: var(--fg-hi); overflow-wrap: anywhere; }
 .ws-proyectos .case-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px; }
@@ -81,11 +91,16 @@
 .ws-proyectos .project-links a {
   display: inline-flex; align-items: center; min-height: 42px; color: var(--accent); text-underline-offset: 0.2em;
 }
+.ws-proyectos .project-links a:hover { color: var(--fg-hi); }
 
 @media (max-width: 1100px) and (min-width: 821px) {
-  .ws-proyectos .project-workspace { grid-template-columns: minmax(270px, 0.78fr) minmax(0, 1.4fr); }
+  .ws-proyectos .project-workspace { grid-template-columns: minmax(270px, 32vw) minmax(0, 1fr); }
   .ws-proyectos .case-context dl { grid-template-columns: minmax(0, 1fr); }
   .ws-proyectos .case-columns { grid-template-columns: minmax(0, 1fr); gap: 0; }
+}
+
+@media (min-width: 821px) and (max-height: 780px) {
+  .ws-proyectos .project-browser { position: static; }
 }
 
 @media (max-width: 820px) {
@@ -95,12 +110,12 @@
   .ws-proyectos .project-browser {
     position: static; padding: 4px 0 27px; border-right: 0; border-bottom: 1px solid var(--line);
   }
-  .ws-proyectos .project-intro h1 { font-size: 30px; }
+  .ws-proyectos .project-intro h1 { font-size: 29px; }
   .ws-proyectos .project-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .ws-proyectos .project-option { min-height: 48px; padding: 10px 12px; }
+  .ws-proyectos .project-option { min-height: 58px; padding: 10px 11px; }
   .ws-proyectos .option-topline { display: block; }
   .ws-proyectos :is(.project-status, .project-type, .project-period) { display: none; }
-  .ws-proyectos .case-study { max-width: none; padding: 28px 0 22px; }
+  .ws-proyectos .case-study { max-width: none; padding: var(--space-6) 0 var(--space-5); }
   .ws-proyectos .case-heading { display: block; }
   .ws-proyectos .status-badge { display: inline-block; margin-top: 13px; }
   .ws-proyectos .case-summary { font-size: 16px; }
