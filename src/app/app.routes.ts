@@ -5,17 +5,17 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () => import('./workspaces/inicio/inicio').then((m) => m.Inicio),
-    title: 'jose@devbyjose.org',
+    title: 'José Sánchez | Java & Full Stack',
   },
   {
     path: 'proyectos',
     loadComponent: () => import('./workspaces/proyectos/proyectos').then((m) => m.Proyectos),
-    title: 'proyectos · devbyjose.org',
+    title: 'Proyectos | José Sánchez',
   },
   {
     path: 'homelab',
     loadComponent: () => import('./workspaces/homelab/homelab').then((m) => m.HomelabWs),
-    title: 'homelab · devbyjose.org',
+    title: 'Homelab | José Sánchez',
   },
   // Con las notas ocultas estas rutas no se registran, así que /notas cae en
   // el comodín y redirige al inicio en vez de mostrar una sección vacía.

@@ -182,7 +182,9 @@
   .ws-inicio .project-link { margin-top: 7px; }
   .ws-inicio .project-meta { font-size: 12px; }
   .ws-inicio .split-heading { align-items: end; }
-  .ws-inicio .split-heading .section-link { font-size: 13px; }
+  .ws-inicio .split-heading .section-link {
+    display: inline-flex; align-items: center; min-height: 44px; font-size: 13px;
+  }
   .ws-inicio .contact { padding: 22px 17px; }
   .ws-inicio .contact-actions a { display: inline-flex; align-items: center; min-height: 44px; }
   .ws-inicio .hist { grid-template-columns: 58px minmax(0, 1fr); }

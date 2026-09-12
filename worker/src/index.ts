@@ -40,18 +40,20 @@ const json = (cuerpo: unknown, estado: number, origen: string): Response =>
     headers: {
       'content-type': 'application/json; charset=utf-8',
       'access-control-allow-origin': origen,
-      'vary': 'origin',
+      vary: 'origin',
     },
   });
 
 export default {
   async fetch(req: Request, env: Env): Promise<Response> {
-    const permitidos = env.ORIGENES_PERMITIDOS.split(',').map((o) => o.trim()).filter(Boolean);
+    const permitidos = env.ORIGENES_PERMITIDOS.split(',')
+      .map((o) => o.trim())
+      .filter(Boolean);
     const solicitante = req.headers.get('origin');
     // Se devuelve el origen que pidió, no una constante: con varios dominios,
     // responder siempre el mismo hace que el navegador rechace los demás.
     const permitido = !!solicitante && permitidos.includes(solicitante);
-    const origen = permitido ? solicitante : permitidos[0];
+    const origen = permitido ? solicitante : (permitidos[0] ?? 'https://www.devbyjose.org');
 
     if (req.method === 'OPTIONS') {
       return new Response(null, {

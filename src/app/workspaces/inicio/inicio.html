@@ -76,7 +76,7 @@
             <p class="project-stack">{{ project.stack }}</p>
             @if (project.href) {
               <a class="project-link" [href]="project.href" target="_blank" rel="noopener noreferrer"
-                 [attr.aria-label]="'Ver ' + project.name + ' en GitHub (se abre en una pestaña nueva)'">
+                 [attr.aria-label]="'Ver proyecto: ' + project.name + ' en GitHub (se abre en una pestaña nueva)'">
                 Ver proyecto →
               </a>
             } @else {

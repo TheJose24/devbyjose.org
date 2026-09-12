@@ -11,7 +11,7 @@ function sinComentarios(texto: string): string {
   let escapado = false;
 
   for (let i = 0; i < texto.length; i++) {
-    const c = texto[i];
+    const c = texto[i]!;
     if (enCadena) {
       fuera += c;
       if (escapado) escapado = false;
@@ -37,7 +37,7 @@ function sinComentarios(texto: string): string {
 const cfg = JSON.parse(sinComentarios(readFileSync('wrangler.jsonc', 'utf8')));
 const origenes: string[] = cfg.vars.ORIGENES_PERMITIDOS.split(',').map((o: string) => o.trim());
 /** El host que sirve el sitio. Puede ser un subdominio, como www. */
-const host = new URL(origenes[0]).hostname;
+const host = new URL(origenes[0]!).hostname;
 /**
  * La zona del dominio, que no es lo mismo que el host: el sitio vive en
  * www.ejemplo.org pero el correo y las rutas cuelgan de ejemplo.org.
@@ -90,7 +90,7 @@ describe('wrangler.jsonc', () => {
   });
 
   it('el destino de send_email coincide con el buzón que se anuncia', () => {
-    expect(cfg.send_email[0].destination_address).toBe(cfg.vars.DESTINO);
+    expect(cfg.send_email[0]!.destination_address).toBe(cfg.vars.DESTINO);
   });
 
   it('hay una ventana corta y una larga', () => {
